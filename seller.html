@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Search for property information and submit a property for sale through MREO."
+  >
+
+  <title>Sell Property As Is | MREO</title>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="seller-page">
+  <header class="site-header">
+    <a
+      class="brand"
+      href="index.html"
+      aria-label="Return to MREO home"
+    >
+      <span class="brand-mark" aria-hidden="true">
+        <span class="brand-circle"></span>
+        <span class="brand-square"></span>
+      </span>
+
+      <span class="brand-name">MREO</span>
+    </a>
+
+    <p class="prototype-label">Seller Pathway</p>
+  </header>
+
+  <main class="page-shell">
+    <a class="back-link" href="index.html">
+      <span aria-hidden="true">←</span>
+      Return home
+    </a>
+
+    <section
+      class="page-heading"
+      aria-labelledby="seller-page-title"
+    >
+      <h1 id="seller-page-title">
+        Sell Property As Is
+      </h1>
+
+      <p>
+        Search for your property, review the information that can be
+        identified automatically, and complete any remaining details
+        needed to prepare the property for sale.
+      </p>
+    </section>
+
+    <div class="content-layout">
+      <div>
+
+        <!-- ======================================
+             PROPERTY SEARCH
+             ====================================== -->
+
+        <section
+          class="form-panel"
+          aria-labelledby="seller-property-search-heading"
+        >
+          <p class="section-label">
+            Property lookup
+          </p>
+
+          <h2 id="seller-property-search-heading">
+            Find your property
+          </h2>
+
+          <p>
+            Enter the complete property address. MREO will prepare links
+            to the property's Zillow results and Google Maps location and
+            use available property information to fill in as much of the
+            seller form as possible.
+          </p>
+
+          <form id="seller-search-form">
+            <div class="form-field full-width">
+              <label for="seller-property-search-address">
+                Property address
+              </label>
+
+              <div class="address-search">
+                <input
+                  id="seller-property-search-address"
+                  name="sellerPropertySearchAddress"
+                  type="text"
+                  autocomplete="street-address"
+                  placeholder="123 Main Street, Dallas, TX 75201"
+                  required
+                >
+
+                <button
+                  class="primary-button button-blue"
+                  type="submit"
+                >
+                  Search
+                </button>
+              </div>
+
+              <p class="field-note">
+                Include the street address, city, state, and ZIP code
+                when available for the most accurate results.
+              </p>
+            </div>
+          </form>
+
+          <div
+            id="seller-search-result"
+            class="search-result"
+            role="status"
+            aria-live="polite"
+            hidden
+          >
+            <p>
+              Property search results are ready for:
+              <strong id="seller-searched-property-address"></strong>
+            </p>
+
+            <div
+              id="seller-autofill-message"
+              class="property-autofill-message"
+            >
+              Available property information has been added to the
+              form below. Please review each field and make any
+              necessary corrections.
+            </div>
+
+            <div class="button-group">
+              <a
+                id="seller-zillow-property-link"
+                class="primary-button button-blue"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open Zillow
+              </a>
+
+              <a
+                id="seller-google-maps-link"
+                class="secondary-button"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View on Google Maps
+              </a>
+            </div>
+
+            <p class="field-note">
+              Property and listing information varies by address and
+              by the public information available for that property.
+              Review automatically populated information before
+              submitting.
+            </p>
+          </div>
+        </section>
+
+        <!-- ======================================
+             SELLER PROPERTY FORM
+             ====================================== -->
+
+        <section
+          class="form-panel"
+          aria-labelledby="property-information-heading"
+          style="margin-top: 28px;"
+        >
+          <h2 id="property-information-heading">
+            Property information
+          </h2>
+
+          <p class="field-note property-review-note">
+            Fields populated by the property search remain editable.
+            Please correct or complete any information that is
+            inaccurate or unavailable.
+          </p>
+
+          <form id="seller-form">
+            <div class="form-grid">
+
+              <!-- ADDRESS -->
+
+              <div class="form-field full-width">
+                <label for="property-address">
+                  Street address
+                </label>
+
+                <input
+                  id="property-address"
+                  name="propertyAddress"
+                  type="text"
+                  autocomplete="street-address"
+                  placeholder="123 Main Street"
+                  required
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="property-city">
+                  City
+                </label>
+
+                <input
+                  id="property-city"
+                  name="propertyCity"
+                  type="text"
+                  autocomplete="address-level2"
+                  placeholder="Dallas"
+                  required
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="property-state">
+                  State
+                </label>
+
+                <select
+                  id="property-state"
+                  name="propertyState"
+                  required
+                >
+                  <option value="">
+                    Select state
+                  </option>
+
+                  <option value="AL">Alabama</option>
+                  <option value="AK">Alaska</option>
+                  <option value="AZ">Arizona</option>
+                  <option value="AR">Arkansas</option>
+                  <option value="CA">California</option>
+                  <option value="CO">Colorado</option>
+                  <option value="CT">Connecticut</option>
+                  <option value="DE">Delaware</option>
+                  <option value="DC">District of Columbia</option>
+                  <option value="FL">Florida</option>
+                  <option value="GA">Georgia</option>
+                  <option value="HI">Hawaii</option>
+                  <option value="ID">Idaho</option>
+                  <option value="IL">Illinois</option>
+                  <option value="IN">Indiana</option>
+                  <option value="IA">Iowa</option>
+                  <option value="KS">Kansas</option>
+                  <option value="KY">Kentucky</option>
+                  <option value="LA">Louisiana</option>
+                  <option value="ME">Maine</option>
+                  <option value="MD">Maryland</option>
+                  <option value="MA">Massachusetts</option>
+                  <option value="MI">Michigan</option>
+                  <option value="MN">Minnesota</option>
+                  <option value="MS">Mississippi</option>
+                  <option value="MO">Missouri</option>
+                  <option value="MT">Montana</option>
+                  <option value="NE">Nebraska</option>
+                  <option value="NV">Nevada</option>
+                  <option value="NH">New Hampshire</option>
+                  <option value="NJ">New Jersey</option>
+                  <option value="NM">New Mexico</option>
+                  <option value="NY">New York</option>
+                  <option value="NC">North Carolina</option>
+                  <option value="ND">North Dakota</option>
+                  <option value="OH">Ohio</option>
+                  <option value="OK">Oklahoma</option>
+                  <option value="OR">Oregon</option>
+                  <option value="PA">Pennsylvania</option>
+                  <option value="RI">Rhode Island</option>
+                  <option value="SC">South Carolina</option>
+                  <option value="SD">South Dakota</option>
+                  <option value="TN">Tennessee</option>
+                  <option value="TX">Texas</option>
+                  <option value="UT">Utah</option>
+                  <option value="VT">Vermont</option>
+                  <option value="VA">Virginia</option>
+                  <option value="WA">Washington</option>
+                  <option value="WV">West Virginia</option>
+                  <option value="WI">Wisconsin</option>
+                  <option value="WY">Wyoming</option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="property-zip">
+                  ZIP code
+                </label>
+
+                <input
+                  id="property-zip"
+                  name="propertyZip"
+                  type="text"
+                  inputmode="numeric"
+                  autocomplete="postal-code"
+                  placeholder="75201"
+                  pattern="[0-9]{5}(-[0-9]{4})?"
+                  title="Enter a five-digit ZIP code or ZIP+4."
+                  required
+                >
+              </div>
+
+              <!-- CORE PROPERTY INFORMATION -->
+
+              <div class="form-field">
+                <label for="property-type">
+                  Property type
+                </label>
+
+                <select
+                  id="property-type"
+                  name="propertyType"
+                  required
+                >
+                  <option value="">
+                    Select property type
+                  </option>
+
+                  <option value="Single-family home">
+                    Single-family home
+                  </option>
+
+                  <option value="Condominium">
+                    Condominium
+                  </option>
+
+                  <option value="Townhouse">
+                    Townhouse
+                  </option>
+
+                  <option value="Multifamily">
+                    Multifamily
+                  </option>
+
+                  <option value="Commercial">
+                    Commercial
+                  </option>
+
+                  <option value="Land">
+                    Land
+                  </option>
+
+                  <option value="Other">
+                    Other
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="property-bedrooms">
+                  Bedrooms
+                </label>
+
+                <input
+                  id="property-bedrooms"
+                  name="propertyBedrooms"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="3"
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="property-bathrooms">
+                  Bathrooms
+                </label>
+
+                <input
+                  id="property-bathrooms"
+                  name="propertyBathrooms"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  placeholder="2"
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="property-size">
+                  Square footage
+                </label>
+
+                <input
+                  id="property-size"
+                  name="propertySize"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="1800"
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="property-lot-size">
+                  Lot size
+                </label>
+
+                <input
+                  id="property-lot-size"
+                  name="propertyLotSize"
+                  type="text"
+                  placeholder="0.21 acres"
+                >
+
+                <p class="field-note">
+                  Automatically populated when available.
+                </p>
+              </div>
+
+              <div class="form-field">
+                <label for="property-year-built">
+                  Year built
+                </label>
+
+                <input
+                  id="property-year-built"
+                  name="propertyYearBuilt"
+                  type="number"
+                  min="1700"
+                  max="2100"
+                  step="1"
+                  placeholder="1998"
+                >
+
+                <p class="field-note">
+                  Automatically populated when available.
+                </p>
+              </div>
+
+              <!-- PUBLIC MARKET INFORMATION -->
+
+              <div class="form-field">
+                <label for="property-public-status">
+                  Public listing status
+                </label>
+
+                <input
+                  id="property-public-status"
+                  name="propertyPublicStatus"
+                  type="text"
+                  placeholder="For sale, off market, pending, etc."
+                >
+
+                <p class="field-note">
+                  Based on available public property information.
+                </p>
+              </div>
+
+              <div class="form-field">
+                <label for="property-public-price">
+                  Publicly listed price
+                </label>
+
+                <input
+                  id="property-public-price"
+                  name="propertyPublicPrice"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="250000"
+                >
+
+                <p class="field-note">
+                  The most recent public listing price, when available.
+                </p>
+              </div>
+
+              <div class="form-field">
+                <label for="property-estimated-value">
+                  Estimated property value
+                </label>
+
+                <input
+                  id="property-estimated-value"
+                  name="propertyEstimatedValue"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="265000"
+                >
+
+                <p class="field-note">
+                  Automatically populated when a public estimate is
+                  available. This is not an MREO appraisal.
+                </p>
+              </div>
+
+              <div class="form-field">
+                <label for="asking-price">
+                  Seller asking price
+                </label>
+
+                <input
+                  id="asking-price"
+                  name="askingPrice"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="250000"
+                >
+
+                <p class="field-note">
+                  Optional. You may change this amount regardless of
+                  publicly available pricing information, or leave it
+                  blank if you prefer to receive offers.
+                </p>
+              </div>
+
+              <!-- SELLER-CONFIRMED INFORMATION -->
+
+              <div class="form-field">
+                <label for="property-condition">
+                  General condition
+                </label>
+
+                <select
+                  id="property-condition"
+                  name="propertyCondition"
+                  required
+                >
+                  <option value="">
+                    Select condition
+                  </option>
+
+                  <option value="Move-in ready">
+                    Move-in ready
+                  </option>
+
+                  <option value="Minor cosmetic updates needed">
+                    Minor cosmetic updates needed
+                  </option>
+
+                  <option value="Moderate repairs needed">
+                    Moderate repairs needed
+                  </option>
+
+                  <option value="Major rehabilitation needed">
+                    Major rehabilitation needed
+                  </option>
+
+                  <option value="Condition unknown">
+                    Condition unknown
+                  </option>
+                </select>
+
+                <p class="field-note">
+                  Please confirm this yourself rather than relying only
+                  on public listing information.
+                </p>
+              </div>
+
+              <div class="form-field">
+                <label for="occupancy-status">
+                  Occupancy
+                </label>
+
+                <select
+                  id="occupancy-status"
+                  name="occupancyStatus"
+                >
+                  <option value="">
+                    Select occupancy
+                  </option>
+
+                  <option value="Owner occupied">
+                    Owner occupied
+                  </option>
+
+                  <option value="Tenant occupied">
+                    Tenant occupied
+                  </option>
+
+                  <option value="Vacant">
+                    Vacant
+                  </option>
+
+                  <option value="Other">
+                    Other
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-field full-width">
+                <label for="property-details">
+                  Known issues or additional details
+                </label>
+
+                <textarea
+                  id="property-details"
+                  name="propertyDetails"
+                  placeholder="Briefly describe known repairs, property features, title concerns, tenant arrangements, or other relevant information."
+                ></textarea>
+
+                <p class="field-note">
+                  An as-is sale does not eliminate disclosure obligations
+                  that apply under state or local law.
+                </p>
+              </div>
+
+              <!-- MEDIA -->
+
+              <div class="form-field full-width">
+                <label for="property-media">
+                  Property photographs or video
+                </label>
+
+                <div class="upload-area">
+                  <p class="upload-title">
+                    Select images or video
+                  </p>
+
+                  <p class="upload-note">
+                    You can select multiple files.
+                  </p>
+
+                  <input
+                    id="property-media"
+                    name="propertyMedia"
+                    type="file"
+                    accept="image/*,video/*"
+                    multiple
+                  >
+                </div>
+
+                <div
+                  id="media-preview"
+                  class="media-preview"
+                  aria-live="polite"
+                ></div>
+
+                <p class="field-note">
+                  This prototype previews selected files in your browser.
+                  Permanent uploads require a connected storage service.
+                </p>
+              </div>
+
+              <!-- CONTACT INFORMATION -->
+
+              <div class="form-field full-width">
+                <h2>Seller contact information</h2>
+              </div>
+
+              <div class="form-field">
+                <label for="seller-name">
+                  Full name
+                </label>
+
+                <input
+                  id="seller-name"
+                  name="sellerName"
+                  type="text"
+                  autocomplete="name"
+                  placeholder="Your name"
+                  required
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="seller-email">
+                  Email address
+                </label>
+
+                <input
+                  id="seller-email"
+                  name="sellerEmail"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="you@example.com"
+                  required
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="seller-phone">
+                  Phone number
+                </label>
+
+                <input
+                  id="seller-phone"
+                  name="sellerPhone"
+                  type="tel"
+                  autocomplete="tel"
+                  placeholder="(214) 555-0123"
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="sale-timeline">
+                  Preferred sale timeline
+                </label>
+
+                <select
+                  id="sale-timeline"
+                  name="saleTimeline"
+                >
+                  <option value="">
+                    Select timeline
+                  </option>
+
+                  <option value="As soon as possible">
+                    As soon as possible
+                  </option>
+
+                  <option value="Within 30 days">
+                    Within 30 days
+                  </option>
+
+                  <option value="Within 60 days">
+                    Within 60 days
+                  </option>
+
+                  <option value="Within 90 days">
+                    Within 90 days
+                  </option>
+
+                  <option value="Flexible">
+                    Flexible
+                  </option>
+                </select>
+              </div>
+
+              <div class="checkbox-field full-width">
+                <input
+                  id="seller-confirmation"
+                  name="sellerConfirmation"
+                  type="checkbox"
+                  required
+                >
+
+                <label for="seller-confirmation">
+                  I confirm that I own this property or am authorized to
+                  provide information about it, and I understand that
+                  submitting this prototype form does not create a binding
+                  agreement.
+                </label>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button
+                class="primary-button"
+                type="submit"
+              >
+                Submit Property Information
+              </button>
+
+              <button
+                id="open-seller-contract"
+                class="contract-button"
+                type="button"
+                data-open-modal="seller-contract-modal"
+              >
+                View Seller As-Is Agreement
+              </button>
+            </div>
+
+            <div
+              id="seller-message"
+              class="form-message success-message"
+              role="status"
+              aria-live="polite"
+              hidden
+            ></div>
+          </form>
+        </section>
+      </div>
+
+      <!-- ======================================
+           SELLER GUIDANCE
+           ====================================== -->
+
+      <aside
+        class="info-panel"
+        aria-labelledby="seller-guidance-heading"
+      >
+        <p class="section-label">
+          The seller pathway
+        </p>
+
+        <h2 id="seller-guidance-heading">
+          Start with the property.
+        </h2>
+
+        <p>
+          Searching for the property first can reduce the amount of
+          information you need to enter manually and gives you an
+          opportunity to review publicly available property information
+          before submitting it to MREO.
+        </p>
+
+        <p>
+          Automatically identified information should still be reviewed
+          by the seller. Public records and listing information can be
+          incomplete or outdated.
+        </p>
+
+        <p>
+          Useful seller information includes:
+        </p>
+
+        <ul>
+          <li>
+            Confirmed property characteristics and size.
+          </li>
+
+          <li>
+            The property's present physical condition.
+          </li>
+
+          <li>
+            Current occupancy.
+          </li>
+
+          <li>
+            Known repair or rehabilitation needs.
+          </li>
+
+          <li>
+            Photographs or video showing the property.
+          </li>
+
+          <li>
+            The seller's preferred price and timeline.
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+
+  <!-- ======================================
+       SELLER AGREEMENT
+       ====================================== -->
+
+  <section
+    id="seller-contract-modal"
+    class="contract-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="seller-contract-title"
+    hidden
+  >
+    <div class="contract-content">
+      <div class="contract-header">
+        <h2 id="seller-contract-title">
+          Seller As-Is Property Agreement
+        </h2>
+
+        <button
+          class="close-modal"
+          type="button"
+          aria-label="Close agreement"
+          data-close-modal
+        >
+          ×
+        </button>
+      </div>
+
+      <div
+        id="seller-contract-body"
+        class="contract-body"
+      >
+        <p>
+          <strong>Date:</strong>
+          <span id="contract-date">
+            ____________________
+          </span>
+        </p>
+
+        <p>
+          <strong>Seller:</strong>
+          <span id="contract-seller-name">
+            ____________________
+          </span>
+        </p>
+
+        <p>
+          <strong>Buyer:</strong>
+          ____________________
+        </p>
+
+        <p>
+          <strong>Property:</strong>
+          <span id="contract-property-address">
+            ________________________________________________
+          </span>
+        </p>
+
+        <p>
+          <strong>Purchase price:</strong>
+          <span id="contract-purchase-price">
+            ____________________
+          </span>
+        </p>
+
+        <h3>1. Agreement to sell</h3>
+
+        <p>
+          Seller agrees to sell, and Buyer agrees to purchase, the
+          property identified above for the agreed purchase price,
+          subject to the terms of this agreement and any additional
+          written terms signed by both parties.
+        </p>
+
+        <h3>2. As-is condition</h3>
+
+        <p>
+          The property is offered and accepted in its present, as-is
+          condition. Except as otherwise agreed in writing, Seller is
+          not required to make repairs, improvements, or replacements
+          before closing.
+        </p>
+
+        <h3>3. Disclosures and inspection</h3>
+
+        <p>
+          Seller shall provide disclosures required by applicable law
+          and shall not knowingly conceal material defects. Buyer may
+          inspect the property during any inspection period agreed to
+          in writing.
+        </p>
+
+        <h3>4. Title and closing</h3>
+
+        <p>
+          Closing shall occur on a mutually agreed date through a title
+          company, attorney, escrow provider, or other authorized
+          settlement professional. Seller shall convey the interest
+          agreed upon, subject to disclosed exceptions and applicable
+          closing requirements.
+        </p>
+
+        <h3>5. Costs and additional terms</h3>
+
+        <p>
+          Closing costs, deposits, financing arrangements, possession,
+          and any contingencies shall be allocated according to a
+          separate written agreement or applicable local practice.
+        </p>
+
+        <h3>6. Entire understanding</h3>
+
+        <p>
+          Changes to this agreement must be in writing and signed by
+          both parties. This sample is provided for demonstration
+          purposes and should be reviewed by a qualified attorney
+          before use.
+        </p>
+
+        <div class="signature-grid">
+          <div class="signature-line">
+            Seller signature / Date
+          </div>
+
+          <div class="signature-line">
+            Buyer signature / Date
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button
+          class="primary-button"
+          type="button"
+          data-print-contract="seller-contract-body"
+        >
+          Print Agreement
+        </button>
+
+        <button
+          class="secondary-button"
+          type="button"
+          data-close-modal
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p>
+      This is a demonstration prototype. It does not provide legal,
+      brokerage, appraisal, title, lending, or investment services.
+    </p>
+
+    <p>
+      &copy; <span id="current-year">2026</span> MREO
+    </p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

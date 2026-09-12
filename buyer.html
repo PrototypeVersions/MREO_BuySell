@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Browse available properties and prepare for an as-is real estate purchase through MREO."
+  >
+
+  <title>Buy Property As Is | MREO</title>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="buyer-page">
+  <header class="site-header">
+    <a
+      class="brand"
+      href="index.html"
+      aria-label="Return to MREO home"
+    >
+      <span class="brand-mark" aria-hidden="true">
+        <span class="brand-circle"></span>
+        <span class="brand-square"></span>
+      </span>
+
+      <span class="brand-name">MREO</span>
+    </a>
+
+    <p class="prototype-label">Buyer Pathway</p>
+  </header>
+
+  <main class="page-shell">
+    <a class="back-link" href="index.html">
+      <span aria-hidden="true">←</span>
+      Return home
+    </a>
+
+    <section
+      class="page-heading"
+      aria-labelledby="buyer-page-title"
+    >
+      <h1 id="buyer-page-title">
+        Buy Property As Is
+      </h1>
+
+      <p>
+        Browse properties currently available through MREO, review
+        their key information, and prepare your interest in an
+        as-is purchase.
+      </p>
+    </section>
+
+    <div class="content-layout">
+      <div>
+        <section
+          class="form-panel"
+          aria-labelledby="available-properties-heading"
+        >
+          <p class="section-label">
+            Property marketplace
+          </p>
+
+          <h2 id="available-properties-heading">
+            Find an available property
+          </h2>
+
+          <p>
+            View properties currently available through the MREO
+            network. Compare asking prices, property size, bedrooms,
+            bathrooms, location, condition, and other key information
+            before preparing your interest.
+          </p>
+
+          <div class="form-actions">
+            <a
+              class="primary-button button-blue"
+              href="properties.html"
+            >
+              Search Available Properties
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </section>
+
+        <section
+          class="form-panel"
+          aria-labelledby="buyer-information-heading"
+          style="margin-top: 28px;"
+        >
+          <h2 id="buyer-information-heading">
+            Prepare your interest
+          </h2>
+
+          <form id="buyer-form">
+            <div class="form-grid">
+              <div class="form-field full-width">
+                <label for="buyer-offer-address">
+                  Property address
+                </label>
+
+                <input
+                  id="buyer-offer-address"
+                  name="buyerOfferAddress"
+                  type="text"
+                  autocomplete="street-address"
+                  placeholder="Property address"
+                  required
+                >
+
+                <p class="field-note">
+                  If you select a property from the available-property
+                  list, its address can be added here automatically.
+                  You may also enter an address manually.
+                </p>
+              </div>
+
+              <div class="form-field">
+                <label for="buyer-name">
+                  Full name
+                </label>
+
+                <input
+                  id="buyer-name"
+                  name="buyerName"
+                  type="text"
+                  autocomplete="name"
+                  placeholder="Your name"
+                  required
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="buyer-email">
+                  Email address
+                </label>
+
+                <input
+                  id="buyer-email"
+                  name="buyerEmail"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="you@example.com"
+                  required
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="buyer-phone">
+                  Phone number
+                </label>
+
+                <input
+                  id="buyer-phone"
+                  name="buyerPhone"
+                  type="tel"
+                  autocomplete="tel"
+                  placeholder="(214) 555-0123"
+                >
+              </div>
+
+              <div class="form-field">
+                <label for="buyer-offer-amount">
+                  Proposed offer
+                </label>
+
+                <input
+                  id="buyer-offer-amount"
+                  name="buyerOfferAmount"
+                  type="number"
+                  min="0"
+                  step="1"
+                  placeholder="250000"
+                >
+
+                <p class="field-note">
+                  Optional. You can express interest without naming
+                  a price.
+                </p>
+              </div>
+
+              <div class="form-field">
+                <label for="buyer-purchase-method">
+                  Purchase method
+                </label>
+
+                <select
+                  id="buyer-purchase-method"
+                  name="buyerPurchaseMethod"
+                >
+                  <option value="">
+                    Select purchase method
+                  </option>
+
+                  <option value="Cash">
+                    Cash
+                  </option>
+
+                  <option value="Conventional financing">
+                    Conventional financing
+                  </option>
+
+                  <option value="Private financing">
+                    Private financing
+                  </option>
+
+                  <option value="Reconstruction financing">
+                    Reconstruction financing
+                  </option>
+
+                  <option value="Undecided">
+                    Undecided
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="buyer-timeline">
+                  Preferred purchase timeline
+                </label>
+
+                <select
+                  id="buyer-timeline"
+                  name="buyerTimeline"
+                >
+                  <option value="">
+                    Select timeline
+                  </option>
+
+                  <option value="As soon as possible">
+                    As soon as possible
+                  </option>
+
+                  <option value="Within 30 days">
+                    Within 30 days
+                  </option>
+
+                  <option value="Within 60 days">
+                    Within 60 days
+                  </option>
+
+                  <option value="Within 90 days">
+                    Within 90 days
+                  </option>
+
+                  <option value="Flexible">
+                    Flexible
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-field full-width">
+                <label for="buyer-notes">
+                  Questions or additional information
+                </label>
+
+                <textarea
+                  id="buyer-notes"
+                  name="buyerNotes"
+                  placeholder="Mention inspection questions, financing arrangements, occupancy concerns, repair expectations, or other relevant details."
+                ></textarea>
+              </div>
+
+              <div class="checkbox-field full-width">
+                <input
+                  id="buyer-confirmation"
+                  name="buyerConfirmation"
+                  type="checkbox"
+                  required
+                >
+
+                <label for="buyer-confirmation">
+                  I understand that this is a demonstration prototype,
+                  that submitting this form does not create a binding
+                  offer, and that an as-is purchase should be reviewed
+                  by appropriate professionals.
+                </label>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button
+                class="primary-button button-blue"
+                type="submit"
+              >
+                Submit Buyer Interest
+              </button>
+
+              <button
+                id="open-buyer-contract"
+                class="contract-button"
+                type="button"
+                data-open-modal="buyer-contract-modal"
+              >
+                View Buyer As-Is Agreement
+              </button>
+            </div>
+
+            <div
+              id="buyer-message"
+              class="form-message success-message"
+              role="status"
+              aria-live="polite"
+              hidden
+            ></div>
+          </form>
+        </section>
+      </div>
+
+      <aside
+        class="info-panel"
+        aria-labelledby="buyer-guidance-heading"
+      >
+        <p class="section-label">
+          The buyer pathway
+        </p>
+
+        <h2 id="buyer-guidance-heading">
+          Understand the property.
+        </h2>
+
+        <p>
+          Buying as is generally means accepting the property in its
+          present condition, subject to the written agreement and
+          applicable legal requirements.
+        </p>
+
+        <p>
+          Before making an offer:
+        </p>
+
+        <ul>
+          <li>
+            Review available property and pricing information.
+          </li>
+
+          <li>
+            Consider the property’s location and condition.
+          </li>
+
+          <li>
+            Investigate repair and rehabilitation needs.
+          </li>
+
+          <li>
+            Confirm occupancy, title, taxes, and potential liens.
+          </li>
+
+          <li>
+            Discuss inspections and closing arrangements.
+          </li>
+
+          <li>
+            Consult qualified legal, title, and real estate
+            professionals.
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+
+  <section
+    id="buyer-contract-modal"
+    class="contract-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="buyer-contract-title"
+    hidden
+  >
+    <div class="contract-content">
+      <div class="contract-header">
+        <h2 id="buyer-contract-title">
+          Buyer As-Is Property Agreement
+        </h2>
+
+        <button
+          class="close-modal"
+          type="button"
+          aria-label="Close agreement"
+          data-close-modal
+        >
+          ×
+        </button>
+      </div>
+
+      <div
+        id="buyer-contract-body"
+        class="contract-body"
+      >
+        <p>
+          <strong>Date:</strong>
+          <span id="buyer-contract-date">
+            ____________________
+          </span>
+        </p>
+
+        <p>
+          <strong>Buyer:</strong>
+          <span id="buyer-contract-name">
+            ____________________
+          </span>
+        </p>
+
+        <p>
+          <strong>Seller:</strong>
+          ____________________
+        </p>
+
+        <p>
+          <strong>Property:</strong>
+          <span id="buyer-contract-address">
+            ________________________________________________
+          </span>
+        </p>
+
+        <p>
+          <strong>Proposed purchase price:</strong>
+          <span id="buyer-contract-price">
+            ____________________
+          </span>
+        </p>
+
+        <h3>1. Agreement to purchase</h3>
+
+        <p>
+          Buyer offers to purchase the property identified above for
+          the stated purchase price, subject to Seller’s written
+          acceptance and any additional written terms agreed upon
+          by both parties.
+        </p>
+
+        <h3>2. As-is condition</h3>
+
+        <p>
+          Buyer understands that the property is offered in its
+          present, as-is condition. Unless otherwise agreed in
+          writing, Seller is not obligated to repair, renovate,
+          improve, or replace any part of the property before closing.
+        </p>
+
+        <h3>3. Inspection and due diligence</h3>
+
+        <p>
+          Buyer may inspect the property and investigate its condition,
+          occupancy, title, taxes, restrictions, and other relevant
+          matters during any period agreed to in writing. Any right to
+          withdraw based on inspection findings must be expressly
+          stated in a signed agreement.
+        </p>
+
+        <h3>4. Disclosures</h3>
+
+        <p>
+          Seller remains responsible for disclosures required under
+          applicable law. Acceptance of the property as is does not
+          authorize fraud, intentional concealment, or other conduct
+          prohibited by law.
+        </p>
+
+        <h3>5. Closing and payment</h3>
+
+        <p>
+          Closing shall occur on a mutually agreed date through an
+          authorized settlement provider. Deposits, payment method,
+          financing conditions, closing costs, possession, and related
+          requirements shall be established in a separate written
+          agreement or according to applicable local practice.
+        </p>
+
+        <h3>6. Written modifications</h3>
+
+        <p>
+          Any change to these terms must be written and signed by both
+          parties. This sample is provided for demonstration purposes
+          and should be reviewed by a qualified attorney before use.
+        </p>
+
+        <div class="signature-grid">
+          <div class="signature-line">
+            Buyer signature / Date
+          </div>
+
+          <div class="signature-line">
+            Seller signature / Date
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button
+          class="primary-button button-blue"
+          type="button"
+          data-print-contract="buyer-contract-body"
+        >
+          Print Agreement
+        </button>
+
+        <button
+          class="secondary-button"
+          type="button"
+          data-close-modal
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p>
+      This is a demonstration prototype. It does not provide legal,
+      brokerage, appraisal, title, lending, or investment services.
+    </p>
+
+    <p>
+      &copy; <span id="current-year">2026</span> MREO
+    </p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
