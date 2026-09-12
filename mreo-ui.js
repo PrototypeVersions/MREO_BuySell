@@ -96,9 +96,15 @@ async function portfolio(){
  $("portfolio-search").addEventListener("input",render);$("portfolio-condition").addEventListener("change",render);render();
  }catch(e){message("portfolio-message",e.message,true);}
 }
-async function marketplace(){
+function marketplace(){
  const container=$("new-listings");if(!container)return;
- try{const auctions=await S.list();container.innerHTML=auctions.filter(a=>!a.example).map(a=>'<article class="property-row"><div class="property-thumbnail"><img src="'+(a.kind==="portfolio"?"assets/mreo-portfolio.png":"assets/property-placeholder.svg")+'" alt="'+(a.kind==="portfolio"?"MREO portfolio cover":"Property awaiting seller photographs")+'" loading="lazy"></div><div class="property-main-info"><p class="property-location">'+(S.demo?"Your test listing":"Seller listing")+'</p><h2>'+esc(a.title)+'</h2><p>'+ (a.kind==="portfolio"?(a.portfolioCount??a.portfolio?.length??0)+" properties · One portfolio":"As-is property")+'</p></div><div class="property-facts"><div><span class="property-fact-label">Required bid</span><strong>'+cash(a.reserve)+'</strong></div></div><div class="property-action">'+(a.kind==="portfolio"?'<a class="secondary-button" href="portfolio.html?id='+encodeURIComponent(a.id)+'">Review spreadsheet</a>':"")+'<a class="primary-button" href="auction.html?id='+encodeURIComponent(a.id)+'">View auction</a></div></article>').join("");}catch(e){message("marketplace-message",e.message,true);}
+ const kind=container.dataset.listingKind||"property";
+ return S.list().then(auctions=>{
+  container.innerHTML=auctions.filter(a=>!a.example&&(kind==="portfolio"?a.kind==="portfolio":a.kind!=="portfolio")).map(a=>{
+   if(a.kind==="portfolio")return '<a class="portfolio-entry" href="portfolio.html?id='+encodeURIComponent(a.id)+'"><img src="assets/mreo-portfolio.png" alt="MREO Buy Portfolio As Is" width="768" height="512" loading="lazy"><div><p class="section-label">'+(S.demo?"Your test portfolio":"Available portfolio")+'</p><h2>'+esc(a.title)+'</h2><p>'+(a.portfolioCount??a.portfolio?.length??0)+' properties · Required bid '+cash(a.reserve)+'. Review the complete spreadsheet before preparing your interest.</p><span class="text-link">View portfolio spreadsheet →</span></div></a>';
+   return '<article class="property-row"><div class="property-thumbnail"><img src="assets/property-placeholder.svg" alt="Property awaiting seller photographs" loading="lazy"></div><div class="property-main-info"><p class="property-location">'+(S.demo?"Your test listing":"Seller listing")+'</p><h2>'+esc(a.title)+'</h2><p>As-is property</p></div><div class="property-facts"><div><span class="property-fact-label">Required bid</span><strong>'+cash(a.reserve)+'</strong></div></div><div class="property-action"><a class="primary-button" href="auction.html?id='+encodeURIComponent(a.id)+'">View auction</a></div></article>';
+  }).join("");
+ }).catch(e=>message("marketplace-message",e.message,true));
 }
 async function auctionPage(){
  if(!$("auction-select"))return;

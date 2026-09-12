@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Browse available as-is property portfolios and review their complete property spreadsheets through MREO.">
+  <title>Available Portfolios | MREO</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="marketplace.css">
+</head>
+<body class="portfolios-page">
+  <header class="site-header"><a class="brand" href="index.html" aria-label="MREO home"><span class="brand-mark" aria-hidden="true"><span class="brand-circle"></span><span class="brand-square"></span></span><span class="brand-name">MREO</span></a><nav class="market-nav" aria-label="Main navigation"><a href="buyer.html">Buy</a><a href="seller.html">Sell</a><a href="portfolios.html" aria-current="page">Portfolios</a><a href="auction.html">Auctions</a></nav></header>
+  <div class="protocol-strip" data-mode-label></div>
+  <main class="page-shell">
+    <a class="back-link" href="buyer.html"><span aria-hidden="true">←</span> Return to Buyer Pathway</a>
+    <section class="page-heading properties-heading" aria-labelledby="portfolios-page-title">
+      <p class="section-label">MREO Portfolio Marketplace</p>
+      <h1 id="portfolios-page-title">Available Portfolios</h1>
+      <p>Browse complete property portfolios available for an as-is purchase. Select a portfolio to review its spreadsheet and prepare your interest.</p>
+    </section>
+    <section class="portfolio-marketplace" aria-label="Available portfolios">
+      <a class="portfolio-entry" href="portfolio.html"><img src="assets/mreo-portfolio.png" alt="MREO Buy Portfolio As Is" width="768" height="512"><div><p class="section-label">Institutional &amp; REO portfolios</p><h2>MREO Buy Portfolio As Is</h2><p>Open the 150-property example spreadsheet. Review good properties and properties needing major rehabilitation as one purchase portfolio.</p><span class="text-link">View portfolio spreadsheet →</span></div></a>
+      <div id="new-listings" data-listing-kind="portfolio"></div>
+    </section>
+    <p id="marketplace-message" class="form-message" role="status" hidden></p>
+  </main>
+  <footer class="site-footer">
+    <p>
+      Property listings shown on this demonstration page are fictional
+      and are provided solely to demonstrate the MREO interface.
+    </p>
+
+    <p>
+      &copy; <span id="current-year">2026</span> MREO
+    </p>
+  </footer>
+
+  <script src="mreo-config.js"></script><script src="auction-core.js"></script><script src="mreo-service.js"></script><script src="app.js"></script><script src="mreo-ui.js"></script>
+</body>
+</html>

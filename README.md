@@ -10,8 +10,8 @@ Open [MREO BuySell](https://prototypeversions.github.io/MREO_BuySell/).
 - Open **Auctions** to see the countdown, highest bid and bid count. Open **Test the auction** to select Test Buyer A, B, C, or Test Seller, advance to the result, or restart the example.
 - A green light means a qualifying winning bid; a red light means the bid did not win or the reserve was not met. A winning bid still requires seller acceptance and closing.
 - Seller view shows all associated bids, the highest price at close in green, and proceeds after MREO’s fee. The $1,000 fee is due only if the sale closes, once per property or whole-portfolio transaction. Other closing costs and obligations are separate.
-- Choose **Sell portfolio as is**, upload Excel or CSV, review the import, and set your minimum. The portfolio appears in Available Properties after the test participation step.
-- Click **MREO Buy Portfolio As Is** to open the spreadsheet view and Excel download.
+- Choose **Sell portfolio as is**, upload Excel or CSV, review the import, and set your minimum. The portfolio appears in Available Portfolios after the test participation step.
+- Click **Search Available Portfolios**, then select **MREO Buy Portfolio As Is** to open the spreadsheet view and Excel download.
 
 The default is a complete browser demonstration: test credits, simulated buyers, and saved test auctions are stored only in that browser. The three test bidders never run in the connected service. Test auctions start with one day; 21 days is the standard option. Results appear on the auction screen and persist when it is revisited. No email or text notifications are sent.
 

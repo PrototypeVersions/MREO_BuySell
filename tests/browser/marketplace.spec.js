@@ -1,7 +1,7 @@
 import {test,expect} from "@playwright/test";
 test("all pages load without script errors or horizontal overflow",async({page})=>{
  const errors=[];page.on("pageerror",e=>errors.push(e.message));
- for(const path of ["index.html","buyer.html","seller.html","properties.html","portfolio.html","auction.html","payment.html"]){
+ for(const path of ["index.html","buyer.html","seller.html","properties.html","portfolios.html","portfolio.html","auction.html","payment.html"]){
   await page.goto("/"+path);
   await expect(page.locator("[data-mode-label]")).toContainText("Test mode");
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true);
@@ -46,7 +46,13 @@ test("buyer payment gate, bidding, persistent outcome and both perspectives",asy
  await expect(page.locator("#seller-fee-due")).toHaveText("$1,000");
 });
 test("portfolio spreadsheet filters and actual Excel upload create a complete listing",async({page})=>{
- await page.goto("/portfolio.html");
+ await page.goto("/buyer.html");
+ await expect(page.locator(".portfolio-entry")).toHaveCount(0);
+ await page.getByRole("link",{name:"Search Available Portfolios",exact:true}).click();
+ await expect(page.getByRole("heading",{name:"Available Portfolios",exact:true})).toBeVisible();
+ await expect(page.locator(".portfolio-entry")).toHaveCount(1);
+ await page.locator(".portfolio-entry").click();
+ await expect(page).toHaveURL(/\/portfolio\.html$/);
  await expect(page.locator("#portfolio-count")).toHaveText("150");
  await expect(page.locator("#portfolio-price")).toHaveText("$4,804,450");
  await expect(page.locator("#portfolio-table-body tr")).toHaveCount(150);
@@ -73,8 +79,11 @@ test("portfolio spreadsheet filters and actual Excel upload create a complete li
  await expect(page.locator("#auction-title")).toHaveText("Uploaded REO Portfolio");
  await expect(page.locator("#seller-reserve")).toHaveText("$4,804,450");
  await page.goto("/properties.html");
+ await expect(page.locator(".portfolio-entry")).toHaveCount(0);
+ await expect(page.locator("#new-listings")).not.toContainText("Uploaded REO Portfolio");
+ await page.goto("/portfolios.html");
  await expect(page.locator("#new-listings")).toContainText("Uploaded REO Portfolio");
- await page.locator("#new-listings").getByRole("link",{name:"Review spreadsheet"}).click();
+ await page.locator("#new-listings .portfolio-entry").click();
  await expect(page.locator("#portfolio-count")).toHaveText("150");
  await expect(page.locator("#portfolio-data-label")).toHaveText("Seller-provided portfolio data");
 });
