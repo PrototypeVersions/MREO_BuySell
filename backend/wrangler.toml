@@ -1,0 +1,15 @@
+name = "mreo-buysell-exchange"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+SITE_URL = "https://prototypeversions.github.io/MREO_BuySell"
+ALLOW_LIVE_PAYMENTS = "false"
+
+[[durable_objects.bindings]]
+name = "EXCHANGE"
+class_name = "Exchange"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Exchange"]

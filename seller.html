@@ -16,25 +16,11 @@
   <title>Sell Property As Is | MREO</title>
 
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="marketplace.css">
 </head>
 
 <body class="seller-page">
-  <header class="site-header">
-    <a
-      class="brand"
-      href="index.html"
-      aria-label="Return to MREO home"
-    >
-      <span class="brand-mark" aria-hidden="true">
-        <span class="brand-circle"></span>
-        <span class="brand-square"></span>
-      </span>
-
-      <span class="brand-name">MREO</span>
-    </a>
-
-    <p class="prototype-label">Seller Pathway</p>
-  </header>
+  <header class="site-header"><a class="brand" href="index.html" aria-label="MREO home"><span class="brand-mark" aria-hidden="true"><span class="brand-circle"></span><span class="brand-square"></span></span><span class="brand-name">MREO</span></a><nav class="market-nav" aria-label="Main navigation"><a href="buyer.html">Buy</a><a href="seller.html">Sell</a><a href="portfolio.html">Portfolios</a><a href="auction.html">Auctions</a></nav></header><div class="protocol-strip" data-mode-label></div>
 
   <main class="page-shell">
     <a class="back-link" href="index.html">
@@ -57,7 +43,7 @@
       </p>
     </section>
 
-    <div class="content-layout">
+    <section class="sell-value"><p class="section-label">Your property. Its strongest opportunity.</p><h2>Sell as is.<br>Invite competing offers.</h2><p>Bring buyers together around your property’s present condition. MREO’s auction-style connection gives each interested buyer an opportunity to improve an offer, helping you pursue top dollar without making repairs first.</p><div class="value-grid"><div><strong>$1</strong><span>Participation starts with one dollar for buyers and sellers.</span></div><div><strong>$1,000</strong><span>One MREO success fee, only if your property or entire portfolio sells.</span></div><div><strong>21 days</strong><span>Standard auction period. This test version starts with one day.</span></div></div><p>With clear pricing instead of an open-ended assignment-fee model, you can see how much of the highest offer remains after MREO’s fee. Set your minimum; the required bid includes the $1,000 fee. Additional bid value belongs in your sale proceeds.</p><p class="field-note">Competitive bidding is designed to improve price discovery; the final price depends on buyer interest and property condition. Other closing costs and obligations are separate.</p><div class="form-actions"><a class="secondary-button" href="auction.html">Explore the auction protocol →</a></div></section><fieldset class="listing-choice"><legend>What would you like to sell?</legend><label><input type="radio" id="sell-kind-property" name="listing-kind" value="property" checked> Sell property as is</label><label><input type="radio" id="sell-kind-portfolio" name="listing-kind" value="portfolio"> Sell portfolio as is</label></fieldset><div class="path-steps" aria-label="Seller steps"><span>1 · Submit information</span><span>2 · Complete $1 participation</span><span>3 · Open your auction</span></div><div class="content-layout">
       <div>
 
         <!-- ======================================
@@ -66,7 +52,7 @@
 
         <section
           class="form-panel"
-          aria-labelledby="seller-property-search-heading"
+          id="single-search-panel" aria-labelledby="seller-property-search-heading"
         >
           <p class="section-label">
             Property lookup
@@ -185,8 +171,7 @@
             inaccurate or unavailable.
           </p>
 
-          <form id="seller-form">
-            <div class="form-grid">
+          <form id="seller-form"><div class="form-grid"><fieldset id="portfolio-fields" class="full-width form-grid flat-fieldset" hidden disabled><legend>Portfolio spreadsheet</legend><div class="form-field full-width"><label for="portfolio-title">Portfolio name</label><input type="text" id="portfolio-title" name="portfolioTitle" placeholder="Example: Southwest REO portfolio" maxlength="200" required></div><div class="form-field full-width"><label for="portfolio-file">Upload Excel or CSV</label><div class="upload-area"><p>One row per property. Upload .xlsx, .xls, or .csv, up to 5 MB and 2,000 properties.</p><input id="portfolio-file" name="portfolioFile" type="file" accept=".xlsx,.xls,.csv" required></div><p class="field-note">Required columns: Address, City, State, Condition, Reference Value. Use the example spreadsheet as a template. In test mode, parsed portfolio data stays in this browser.</p><div class="form-actions"><a href="data/REO-150-properties.xlsx" download class="secondary-button">Download example Excel</a><a href="data/portfolio-template.csv" download class="contract-button">Blank CSV template</a></div><p id="portfolio-upload-message" class="form-message" role="status" hidden></p><div id="portfolio-preview"></div></div></fieldset><fieldset id="single-fields" class="full-width form-grid flat-fieldset"><legend class="sr-only">Single-property details</legend>
 
               <!-- ADDRESS -->
 
@@ -641,7 +626,7 @@
                 </p>
               </div>
 
-              <!-- CONTACT INFORMATION -->
+              </fieldset><fieldset class="full-width form-grid auction-terms"><legend>Your auction &amp; minimum</legend><div class="form-field"><label for="seller-minimum">Minimum proceeds after MREO fee</label><input type="number" id="seller-minimum" name="sellerMinimum" min="1" max="999999999000" step="1" placeholder="250000" required><p class="field-note">Before other closing costs and obligations.</p></div><div class="form-field"><label for="auction-days">Auction duration</label><select id="auction-days" name="auctionDays"><option value="1">1 day · Testing</option><option value="21">21 days · Standard</option></select></div><p id="seller-fee-preview" class="fee-preview full-width" role="status"></p><label class="checkbox-field full-width"><input type="checkbox" id="seller-fee-consent" required><span>I understand MREO’s one-time $1,000 fee is due only if this property or portfolio sale closes, and that my required bid includes that fee.</span></label></fieldset><!-- CONTACT INFORMATION -->
 
               <div class="form-field full-width">
                 <h2>Seller contact information</h2>
@@ -995,6 +980,6 @@
     </p>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="mreo-config.js"></script><script src="auction-core.js"></script><script src="mreo-service.js"></script><script src="app.js"></script><script src="mreo-ui.js"></script>
 </body>
 </html>

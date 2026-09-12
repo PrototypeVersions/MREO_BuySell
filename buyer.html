@@ -16,25 +16,11 @@
   <title>Buy Property As Is | MREO</title>
 
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="marketplace.css">
 </head>
 
 <body class="buyer-page">
-  <header class="site-header">
-    <a
-      class="brand"
-      href="index.html"
-      aria-label="Return to MREO home"
-    >
-      <span class="brand-mark" aria-hidden="true">
-        <span class="brand-circle"></span>
-        <span class="brand-square"></span>
-      </span>
-
-      <span class="brand-name">MREO</span>
-    </a>
-
-    <p class="prototype-label">Buyer Pathway</p>
-  </header>
+  <header class="site-header"><a class="brand" href="index.html" aria-label="MREO home"><span class="brand-mark" aria-hidden="true"><span class="brand-circle"></span><span class="brand-square"></span></span><span class="brand-name">MREO</span></a><nav class="market-nav" aria-label="Main navigation"><a href="buyer.html">Buy</a><a href="seller.html">Sell</a><a href="portfolio.html">Portfolios</a><a href="auction.html">Auctions</a></nav></header><div class="protocol-strip" data-mode-label></div>
 
   <main class="page-shell">
     <a class="back-link" href="index.html">
@@ -57,7 +43,7 @@
       </p>
     </section>
 
-    <div class="content-layout">
+    <a class="portfolio-entry" href="portfolio.html"><img src="assets/mreo-portfolio.png" alt="MREO Buy Portfolio As Is" width="768" height="512"><div><p class="section-label">Institutional &amp; REO portfolios</p><h2>MREO Buy Portfolio As Is</h2><p>Open the 150-property example spreadsheet. Review good properties and properties needing major rehabilitation as one purchase portfolio.</p><span class="text-link">View portfolio spreadsheet →</span></div></a><div class="path-steps" aria-label="Buyer steps"><span>1 · Submit buyer interest</span><span>2 · Complete $1 participation</span><span>3 · Enter the auction</span></div><div class="content-layout">
       <div>
         <section
           class="form-panel"
@@ -523,6 +509,6 @@
     </p>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="mreo-config.js"></script><script src="auction-core.js"></script><script src="mreo-service.js"></script><script src="app.js"></script><script src="mreo-ui.js"></script>
 </body>
 </html>

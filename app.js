@@ -1070,69 +1070,11 @@
     ============================================
   */
 
-  function initializeSellerForm() {
-    const sellerForm =
-      document.getElementById(
-        "seller-form"
-      );
-
-    if (!sellerForm) {
-      return;
-    }
-
-    sellerForm.addEventListener(
-      "submit",
-      (event) => {
-        event.preventDefault();
-
-        if (
-          !sellerForm.reportValidity()
-        ) {
-          return;
-        }
-
-        const sellerName =
-          getFieldValue(
-            "seller-name"
-          );
-
-        const propertyAddress =
-          buildSellerPropertyAddress();
-
-        updateSellerContract();
-
-        const message =
-          document.getElementById(
-            "seller-message"
-          );
-
-        showMessage(
-          message,
-          `${sellerName}, your property information for ` +
-            `${propertyAddress} has been prepared successfully. ` +
-            "This demonstration does not transmit or permanently " +
-            "store your information."
-        );
-
-        message.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest"
-        });
-      }
-    );
-
-    sellerForm.addEventListener(
-      "input",
-      updateSellerContract
-    );
-
-    sellerForm.addEventListener(
-      "change",
-      updateSellerContract
-    );
-
-    updateSellerContract();
-  }
+  function initializeSellerForm(){
+ const form=document.getElementById("seller-form");if(!form)return;
+ form.addEventListener("submit",async event=>{event.preventDefault();if(!form.reportValidity())return;const button=event.submitter||form.querySelector('button[type="submit"]');if(button.disabled)return;button.disabled=true;try{updateSellerContract();await window.MreoUI.submitSeller();}catch(error){showMessage(document.getElementById("seller-message"),error.message,"error");}finally{button.disabled=false;}});
+ form.addEventListener("input",updateSellerContract);form.addEventListener("change",updateSellerContract);updateSellerContract();
+}
 
   function buildSellerPropertyAddress() {
     const street =
@@ -1472,71 +1414,11 @@
     ============================================
   */
 
-  function initializeBuyerForm() {
-    const buyerForm =
-      document.getElementById(
-        "buyer-form"
-      );
-
-    if (!buyerForm) {
-      return;
-    }
-
-    buyerForm.addEventListener(
-      "submit",
-      (event) => {
-        event.preventDefault();
-
-        if (
-          !buyerForm.reportValidity()
-        ) {
-          return;
-        }
-
-        const buyerName =
-          getFieldValue(
-            "buyer-name"
-          );
-
-        const address =
-          getFieldValue(
-            "buyer-offer-address"
-          );
-
-        updateBuyerContract();
-
-        const message =
-          document.getElementById(
-            "buyer-message"
-          );
-
-        showMessage(
-          message,
-          `${buyerName}, your interest in ${address} has been ` +
-            "prepared successfully. This demonstration does not " +
-            "transmit your information or create a binding " +
-            "purchase offer."
-        );
-
-        message.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest"
-        });
-      }
-    );
-
-    buyerForm.addEventListener(
-      "input",
-      updateBuyerContract
-    );
-
-    buyerForm.addEventListener(
-      "change",
-      updateBuyerContract
-    );
-
-    updateBuyerContract();
-  }
+  function initializeBuyerForm(){
+ const form=document.getElementById("buyer-form");if(!form)return;
+ form.addEventListener("submit",async event=>{event.preventDefault();if(!form.reportValidity())return;const button=event.submitter||form.querySelector('button[type="submit"]');if(button.disabled)return;button.disabled=true;try{updateBuyerContract();await window.MreoUI.submitBuyer();}catch(error){showMessage(document.getElementById("buyer-message"),error.message,"error");}finally{button.disabled=false;}});
+ form.addEventListener("input",updateBuyerContract);form.addEventListener("change",updateBuyerContract);updateBuyerContract();
+}
 
   function updateBuyerContract() {
     const offerAddress =
