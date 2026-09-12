@@ -1,11 +1,25 @@
 import {test,expect} from "@playwright/test";
 test("all pages load without script errors or horizontal overflow",async({page})=>{
  const errors=[];page.on("pageerror",e=>errors.push(e.message));
- for(const path of ["index.html","buyer.html","seller.html","properties.html","portfolios.html","portfolio.html","auction.html","payment.html"]){
+ for(const path of ["index.html","buyer.html","seller.html","properties.html","turkey-property.html","portfolios.html","portfolio.html","auction.html","payment.html"]){
   await page.goto("/"+path);
   await expect(page.locator("[data-mode-label]")).toContainText("Test mode");
   await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true);
  }
+ await page.goto("/properties.html");
+ const turkey=page.locator(".property-marketplace > .property-row").nth(2);
+ await expect(turkey.locator(".property-location")).toHaveText("Turkey");
+ await expect(turkey.locator("h2")).toHaveText("Address awaiting confirmation");
+ await expect(turkey.locator(".property-facts strong")).toHaveText(["$7,500,000","NA","NA / NA","NA"]);
+ await turkey.getByRole("link",{name:"View / Prepare Interest",exact:true}).click();
+ await expect(page).toHaveURL(/\/turkey-property\.html$/);
+ await expect(page.getByRole("heading",{name:"Address awaiting confirmation",exact:true})).toBeVisible();
+ await expect(page.getByRole("link",{name:"Watch the YouTube video"})).toHaveAttribute("href","https://www.youtube.com/watch?v=MUdBlpLWFEY");
+ await page.getByRole("link",{name:"Prepare Interest",exact:true}).click();
+ await expect(page).toHaveURL(/buyer\.html\?address=/);
+ await expect(page.locator("#buyer-offer-address")).toHaveValue("Address awaiting confirmation, Turkey");
+ await expect(page.locator("#buyer-offer-amount")).toHaveValue("7500000");
+ expect(new URL(page.url()).searchParams.has("auction")).toBe(false);
  expect(errors).toEqual([]);
 });
 test("buyer payment gate, bidding, persistent outcome and both perspectives",async({page})=>{
@@ -92,4 +106,53 @@ test("malformed portfolio input is rejected with a clear message",async({page})=
  await page.locator("#portfolio-file").setInputFiles({name:"bad.csv",mimeType:"text/csv",buffer:Buffer.from("Asset ID,Address,City,State,Condition,Reference Value\nA,1 Test St,Dallas,TX,Good,-100")});
  await expect(page.locator("#portfolio-upload-message")).toContainText("Reference Value must be a positive");
  expect(await page.locator("#portfolio-file").evaluate(el=>el.validity.valid)).toBe(false);
+});
+
+test("auction examples migrate existing saved data without losing bids or accounts",async({page})=>{
+ await page.goto("/auction.html");
+ await expect(page.locator("#auction-select option")).toHaveCount(4);
+ const before=await page.evaluate(()=>{
+  const S=window.MreoService,C=window.MreoCore,state=JSON.parse(localStorage.getItem(S.key));
+  delete state.exampleCatalogVersion;
+  delete state.auctions["demo-fort-worth"];
+  delete state.auctions["demo-plano"];
+  const legacy=C.createAuction({id:"video-property",title:"Featured video property",sellerId:"test-seller",minimum:7499000,now:Date.now()-31000,demo:true});
+  legacy.example=true;C.seedDemo(legacy);state.auctions[legacy.id]=legacy;
+  C.placeBid(state.auctions["demo-property"],{buyerId:"test-buyer-a",label:"Test Buyer A",amount:490000,paid:true});
+  state.accounts["test-buyer-a"].creditCents=200;
+  state.accounts["saved-buyer"]={id:"saved-buyer",name:"Saved buyer",role:"buyer",creditCents:100,submission:{auctionId:"video-property"}};
+  const custom=C.createAuction({id:"saved-property",title:"Seller's saved property",sellerId:"test-seller",minimum:100000,demo:true});
+  custom.example=false;state.auctions[custom.id]=custom;
+  localStorage.setItem(S.key,JSON.stringify(state));
+  return {property:state.auctions["demo-property"],portfolio:state.auctions["demo-portfolio"],legacy,accounts:state.accounts,custom};
+ });
+ await page.reload();
+ await expect(page.locator("#auction-select option")).toHaveCount(5);
+ await expect(page.locator('#auction-select option[value="video-property"]')).toHaveCount(0);
+ await expect(page.locator('#auction-select option[value="saved-property"]')).toHaveText("Seller's saved property");
+ const after=await page.evaluate(()=>JSON.parse(localStorage.getItem(window.MreoService.key)));
+ expect(after.auctions["demo-property"].bids).toEqual(before.property.bids);
+ expect(after.auctions["demo-property"].endsAt).toEqual(before.property.endsAt);
+ expect(after.auctions["demo-portfolio"].bids).toEqual(before.portfolio.bids);
+ expect(after.auctions["demo-portfolio"].endsAt).toEqual(before.portfolio.endsAt);
+ expect(after.auctions["video-property"].bids).toEqual(before.legacy.bids);
+ expect(after.auctions["video-property"].hidden).toBe(true);
+ expect(after.accounts).toEqual(before.accounts);
+ expect(after.auctions["saved-property"].endsAt).toEqual(before.custom.endsAt);
+ for(const [id,title] of [["demo-fort-worth","7812 Oak Hollow Lane, Fort Worth, TX 76137"],["demo-plano","2605 Preston Meadow Court, Plano, TX 75093"]]){
+  await page.locator("#auction-select").selectOption(id);
+  await expect(page.locator("#auction-title")).toHaveText(title);
+  await expect(page.locator("#auction-count")).toHaveText("3");
+ }
+ const retiredDraft=await page.evaluate(async()=>{
+  const S=window.MreoService;
+  sessionStorage.setItem(S.key+":demo:buyer",JSON.stringify({id:"saved-buyer",role:"buyer"}));
+  return S.activate("buyer");
+ });
+ expect(retiredDraft.auctionId).toBeNull();
+ await page.reload();
+ await expect(page.locator("#auction-select option")).toHaveCount(5);
+ const again=await page.evaluate(()=>JSON.parse(localStorage.getItem(window.MreoService.key)));
+ expect(again.auctions["demo-fort-worth"].endsAt).toBe(after.auctions["demo-fort-worth"].endsAt);
+ expect(again.auctions["demo-plano"].endsAt).toBe(after.auctions["demo-plano"].endsAt);
 });

@@ -7,7 +7,7 @@ As-is property and portfolio marketplace built from the existing BuySellProperty
 Open [MREO BuySell](https://prototypeversions.github.io/MREO_BuySell/).
 
 - Submit buyer interest or seller information, then complete the clearly marked $1 **test** participation step.
-- Open **Auctions** to see the countdown, highest bid and bid count. Open **Test the auction** to select Test Buyer A, B, C, or Test Seller, advance to the result, or restart the example.
+- Open **Auctions** to see the countdown, highest bid and bid count. The examples include Dallas, Fort Worth, Plano, and the REO portfolio; the Turkey property is not an auction example. Open **Test the auction** to select Test Buyer A, B, C, or Test Seller, advance to the result, or restart the example.
 - A green light means a qualifying winning bid; a red light means the bid did not win or the reserve was not met. A winning bid still requires seller acceptance and closing.
 - Seller view shows all associated bids, the highest price at close in green, and proceeds after MREO’s fee. The $1,000 fee is due only if the sale closes, once per property or whole-portfolio transaction. Other closing costs and obligations are separate.
 - Choose **Sell portfolio as is**, upload Excel or CSV, review the import, and set your minimum. The portfolio appears in Available Portfolios after the test participation step.
@@ -19,7 +19,7 @@ The default is a complete browser demonstration: test credits, simulated buyers,
 
 The 150-property REO workbook contains fictional properties spanning good condition through major rehabilitation. Aggregate reference value is **$68,635,000**; the example asking price is **$4,804,450**, or 7% of reference value. This is an illustration, not a real bank portfolio or valuation. The workbook includes Properties and Summary sheets, formulas, filters, and a frozen header. Both Excel and CSV downloads are included, plus a blank CSV template.
 
-The generic portfolio artwork is generated for this site. The featured $7.5 million listing uses the supplied [property video](https://www.youtube.com/watch?v=MUdBlpLWFEY), YouTube thumbnail and generated frame URLs. Address and property specifications could not be verified from the video connection and remain unspecified. If YouTube blocks an image, the page retains a link to the tour. The original sample listings and property-record lookup remain available. Existing photo/video inputs preview media locally; permanent media storage is not yet connected.
+The generic portfolio artwork is generated for this site. The $7.5 million Turkey property is third in Available Properties, with “Address awaiting confirmation” and NA for unknown specifications. Its View / Prepare Interest link opens a dedicated image and video page, followed by a Prepare Interest link that fills in the buyer form. The page temporarily uses existing YouTube previews from the supplied [property video](https://www.youtube.com/watch?v=MUdBlpLWFEY). The six requested screenshot uploads were unavailable during this edit; replacing these previews and selecting the requested full-front cover image remain pending. If YouTube blocks an image, the page retains a link to the tour. The original sample listings and property-record lookup remain available. Existing photo/video inputs preview media locally; permanent media storage is not yet connected.
 
 ## Connect payments and shared auctions
 

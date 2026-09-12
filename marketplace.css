@@ -33,3 +33,19 @@
 .marketplace-search-actions>.primary-button>span[aria-hidden]{flex-shrink:0}
 .market-nav a[aria-current="page"]{border-bottom-color:var(--blue)}
 @media(max-width:600px){.marketplace-search-actions{gap:10px}.marketplace-search-actions>.primary-button{padding:12px 10px;font-size:12px;gap:6px}}
+
+/* Individual property detail page. Keep the entire supplied image visible. */
+#turkey-property .property-thumbnail img{object-fit:contain;background:#eeeae0}
+.property-detail-price{font-size:clamp(28px,4vw,44px)!important;font-weight:800;letter-spacing:-.04em;color:var(--ink)!important}
+.property-detail-facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;padding:22px 0;margin:0 0 38px;border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
+.property-detail-gallery h2{font-size:26px;letter-spacing:-.03em;margin:0 0 22px}
+.property-gallery-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+.property-gallery-grid figure{margin:0;min-width:0;background:#eeeae0}
+.property-gallery-grid .property-gallery-lead{grid-column:1/-1}
+.property-gallery-grid a{display:block}
+.property-gallery-grid img{display:block;width:100%;height:auto;object-fit:contain}
+.property-gallery-grid .property-gallery-lead img{max-height:640px}
+.property-interest-panel{margin-top:44px;padding:30px 0;border-top:1px solid var(--ink)}
+.property-interest-panel h2{font-size:28px;line-height:1.2;letter-spacing:-.04em;margin:0 0 16px}
+.property-interest-panel .primary-button{margin-top:12px}
+@media(max-width:600px){.property-detail-facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.property-gallery-grid{grid-template-columns:1fr;gap:18px}.property-gallery-grid .property-gallery-lead{grid-column:1}.property-interest-panel .primary-button{width:100%}}

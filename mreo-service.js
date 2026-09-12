@@ -4,6 +4,7 @@ const C=globalThis.MreoCore,config=globalThis.MREO_CONFIG||{mode:"demo"};
 const demo=config.mode!=="connected";
 const root=location.pathname.slice(0,location.pathname.lastIndexOf("/")+1);
 const key="mreo:v3:"+root;
+const visibleAuction=a=>!!a&&!a.hidden&&a.id!=="video-property";
 const sessionKey=role=>key+":"+(demo?"demo":"connected:"+config.apiBase)+":"+role;
 const currentRole=()=>sessionStorage.getItem(key+":role")||"buyer";
 const setRole=role=>sessionStorage.setItem(key+":role",role);
@@ -21,15 +22,29 @@ async function api(path,options={},role=currentRole()){
 }
 async function init(){
  if(!demo){const status=await api("/config");document.querySelectorAll("[data-mode-label]").forEach(el=>{el.textContent=status.testPayments?"Connected test mode · Stripe test payments · No real money":"Connected auctions · Payments verified through Stripe";});return;}
- const s=read();if(s.auctions["demo-property"])return;
- const response=await fetch("data/reo-sample.json");if(!response.ok)throw Error("The example portfolio could not be loaded.");const rows=await response.json();
- for(const [id,name,role] of [["test-buyer-a","Test Buyer A","buyer"],["test-buyer-b","Test Buyer B","buyer"],["test-buyer-c","Test Buyer C","buyer"],["test-seller","Test Seller","seller"]])s.accounts[id]={id,name,role,creditCents:100,test:true};
+ const s=read();if(s.exampleCatalogVersion>=2)return;
+ let rows=[];
+ if(!s.auctions["demo-portfolio"]){
+  const response=await fetch("data/reo-sample.json");if(!response.ok)throw Error("The example portfolio could not be loaded.");rows=await response.json();
+ }
+ for(const [id,name,role] of [["test-buyer-a","Test Buyer A","buyer"],["test-buyer-b","Test Buyer B","buyer"],["test-buyer-c","Test Buyer C","buyer"],["test-seller","Test Seller","seller"]]){
+  if(!s.accounts[id])s.accounts[id]={id,name,role,creditCents:100,test:true};
+ }
  const total=C.portfolioTotals(rows),now=Date.now()-31000;
  const examples=[
- C.createAuction({id:"demo-property",title:"4218 Maple Ridge Drive, Dallas, TX 75229",sellerId:"test-seller",minimum:350000,now,demo:true}),
- C.createAuction({id:"demo-portfolio",title:"Illustrative REO portfolio · 150 properties",sellerId:"test-seller",minimum:Math.round(total.price)-C.FEE,kind:"portfolio",portfolio:rows,now,demo:true}),
- C.createAuction({id:"video-property",title:"Featured video property",sellerId:"test-seller",minimum:7499000,now,demo:true})
- ];for(const a of examples){a.example=true;C.seedDemo(a,Date.now());s.auctions[a.id]=a;}write(s);
+ {id:"demo-property",title:"4218 Maple Ridge Drive, Dallas, TX 75229",minimum:350000},
+ {id:"demo-portfolio",title:"Illustrative REO portfolio · 150 properties",minimum:Math.round(total.price)-C.FEE,kind:"portfolio",portfolio:rows},
+ {id:"demo-fort-worth",title:"7812 Oak Hollow Lane, Fort Worth, TX 76137",minimum:318000},
+ {id:"demo-plano",title:"2605 Preston Meadow Court, Plano, TX 75093",minimum:547000}
+ ];
+ for(const example of examples){
+  if(s.auctions[example.id])continue;
+  const a=C.createAuction({...example,sellerId:"test-seller",now,demo:true});
+  a.example=true;C.seedDemo(a,Date.now());s.auctions[a.id]=a;
+ }
+ // Retain any saved bids on the retired example without offering it for auction.
+ if(s.auctions["video-property"])s.auctions["video-property"].hidden=true;
+ s.exampleCatalogVersion=2;write(s);
 }
 async function register(role,details,submission){
  if(!["buyer","seller"].includes(role))throw Error("Choose a buyer or seller account.");
@@ -60,26 +75,26 @@ async function confirm(role,id){
 async function activate(role){
  if(!demo)return api("/activate",{method:"POST",body:"{}"},role);
  const s=read(),a=s.accounts[session(role)?.id];if(!a||a.creditCents<100)throw Error("Complete the $1 participation step.");
- if(role==="buyer")return {auctionId:a.submission?.auctionId||null};
+ if(role==="buyer"){const id=a.submission?.auctionId;return {auctionId:visibleAuction(s.auctions[id])?id:null};}
  if(a.submission.auctionId)return {auctionId:a.submission.auctionId};
  const draft=a.submission,id=uid("auction");
  const auction=C.createAuction({id,title:draft.title,sellerId:a.id,minimum:draft.minimum,days:draft.days,kind:draft.kind,portfolio:draft.portfolio||[],demo:true});
  auction.example=false;s.auctions[id]=auction;a.submission.auctionId=id;write(s);return {auctionId:id};
 }
 async function list(){
- if(!demo)return (await api("/auctions")).auctions;
- const s=read();for(const a of Object.values(s.auctions))C.seedDemo(a);write(s);return Object.values(s.auctions);
+ if(!demo)return (await api("/auctions")).auctions.filter(visibleAuction);
+ const s=read(),auctions=Object.values(s.auctions).filter(visibleAuction);for(const a of auctions)C.seedDemo(a);write(s);return auctions;
 }
 async function auction(id,view="buyer",actor){
  if(!demo)return api("/auctions/"+encodeURIComponent(id)+"?view="+encodeURIComponent(view),{},view);
- const s=read(),a=s.auctions[id];if(!a)throw Error("This auction was not found. Choose another listing.");
+ const s=read(),a=s.auctions[id];if(!visibleAuction(a))throw Error("This auction was not found. Choose another listing.");
  C.seedDemo(a);write(s);
  const account=actor?s.accounts[actor]:s.accounts[session(view)?.id];
  return {auction:a,account:account||null,isSeller:account?.id===a.sellerId,serverNow:Date.now()};
 }
 async function bid(id,amount,actor){
  if(!demo)return api("/auctions/"+encodeURIComponent(id)+"/bids",{method:"POST",body:JSON.stringify({amount})},"buyer");
- const s=read(),a=s.auctions[id],account=s.accounts[actor||session("buyer")?.id];if(!a)throw Error("Auction not found.");C.seedDemo(a);
+ const s=read(),a=s.auctions[id],account=s.accounts[actor||session("buyer")?.id];if(!visibleAuction(a))throw Error("Auction not found.");C.seedDemo(a);
  C.placeBid(a,{amount,buyerId:account?.id,label:account?.name,paid:account?.creditCents>=100});write(s);return {ok:true};
 }
 async function finish(id){if(!demo)throw Error("Test controls are unavailable.");const s=read(),a=s.auctions[id];if(!a)throw Error("Auction not found.");C.seedDemo(a,a.endsAt-1);const now=Date.now();for(const b of a.bids)b.at=Math.min(b.at,now);a.endsAt=now;C.closeAuction(a);write(s);}
