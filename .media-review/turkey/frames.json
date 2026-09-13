@@ -1,0 +1,38 @@
+{
+  "source": "https://www.youtube.com/watch?v=MUdBlpLWFEY",
+  "processing": "Highest-resolution public YouTube video previews. Original downloaded JPEGs, without generative editing.",
+  "frames": [
+    {
+      "group": "default",
+      "name": "sddefault",
+      "url": "https://i.ytimg.com/vi/MUdBlpLWFEY/sddefault.jpg",
+      "width": 640,
+      "height": 480,
+      "file": "frame-01.jpg"
+    },
+    {
+      "group": "1",
+      "name": "sd1",
+      "url": "https://i.ytimg.com/vi/MUdBlpLWFEY/sd1.jpg",
+      "width": 640,
+      "height": 480,
+      "file": "frame-02.jpg"
+    },
+    {
+      "group": "2",
+      "name": "sd2",
+      "url": "https://i.ytimg.com/vi/MUdBlpLWFEY/sd2.jpg",
+      "width": 640,
+      "height": 480,
+      "file": "frame-03.jpg"
+    },
+    {
+      "group": "3",
+      "name": "sd3",
+      "url": "https://i.ytimg.com/vi/MUdBlpLWFEY/sd3.jpg",
+      "width": 640,
+      "height": 480,
+      "file": "frame-04.jpg"
+    }
+  ]
+}
