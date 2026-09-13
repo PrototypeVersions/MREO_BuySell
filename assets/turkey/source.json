@@ -1,0 +1,35 @@
+{
+  "source": "https://www.youtube.com/watch?v=MUdBlpLWFEY",
+  "processing": "Highest-resolution public YouTube video previews. Original downloaded JPEGs, without generative editing.",
+  "accessNote": "Direct video extraction and normal browser playback required YouTube sign-in. These four public previews are the highest-resolution versions available through the public preview URLs checked (640x480). No artificial details were added.",
+  "images": [
+    {
+      "file": "front-exterior.jpg",
+      "caption": "Front exterior and terraces",
+      "source": "https://i.ytimg.com/vi/MUdBlpLWFEY/sd1.jpg",
+      "width": 640,
+      "height": 480
+    },
+    {
+      "file": "pool-and-waterfront.jpg",
+      "caption": "Pool and waterfront terrace",
+      "source": "https://i.ytimg.com/vi/MUdBlpLWFEY/sd3.jpg",
+      "width": 640,
+      "height": 480
+    },
+    {
+      "file": "aerial-property.jpg",
+      "caption": "Aerial view of the property",
+      "source": "https://i.ytimg.com/vi/MUdBlpLWFEY/sd2.jpg",
+      "width": 640,
+      "height": 480
+    },
+    {
+      "file": "overhead-terrace.jpg",
+      "caption": "Overhead view of the terrace",
+      "source": "https://i.ytimg.com/vi/MUdBlpLWFEY/sddefault.jpg",
+      "width": 640,
+      "height": 480
+    }
+  ]
+}
