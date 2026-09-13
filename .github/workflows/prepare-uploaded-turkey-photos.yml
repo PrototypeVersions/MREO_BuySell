@@ -1,0 +1,26 @@
+name: Prepare uploaded Turkey photos
+on:
+  push:
+    branches: [media/turkey-uploads-20260913]
+    paths:
+      - 'tools/prepare_uploaded_turkey_photos.py'
+      - '.github/workflows/prepare-uploaded-turkey-photos.yml'
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install image encoder
+        run: python -m pip install --disable-pip-version-check Pillow
+      - name: Prepare full-resolution web images
+        run: python tools/prepare_uploaded_turkey_photos.py
+      - name: Save web copies and review sheet
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/turkey/photos .media-review/turkey-uploads
+          git commit -m 'Prepare six uploaded Turkey photos for the website'
+          git push origin HEAD:media/turkey-uploads-20260913
