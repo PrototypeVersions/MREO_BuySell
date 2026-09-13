@@ -177,7 +177,10 @@ test("Test Seller previews the same bids and proceeds as the owner of a submitte
  await expect(page.locator("#bid-history tr")).toHaveCount(1);
  await page.locator("#view-seller").click();
  await expect(page.locator("#seller-private")).toBeHidden();
- await expect(page.locator("#bid-history")).toContainText("Seller access required");
+ await expect(page.locator("#seller-access-message")).toContainText("Only the listing seller");
+ await expect(page.locator("#bid-history-title")).toHaveText("Your bid history");
+ await expect(page.locator("#bid-history tr")).toHaveCount(1);
+ await expect(page.locator("#bid-history")).toContainText("Test Buyer A");
  await page.locator("#test-actor").selectOption("test-seller");
  await expect(page.locator("#bid-history tr")).toHaveText(ownerBids);
  await page.locator("#test-actor").selectOption("");
