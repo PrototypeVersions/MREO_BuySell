@@ -67,7 +67,7 @@ async function payment(){
  button.addEventListener("click",()=>busy(button,async()=>{try{
  a=await S.me(role);if(a.creditCents<100){const r=await S.checkout(role,$("payment-consent").checked);if(!S.demo&&!r.paid){const url=new URL(r.url);if(url.protocol!=="https:"||url.hostname!=="checkout.stripe.com")throw Error("Unexpected checkout address.");location.assign(url.href);return;}a=await S.me(role);$("payment-credit").textContent="$1.00 test";}
  const active=await S.activate(role);
- location.href=active.auctionId?"auction.html?id="+encodeURIComponent(active.auctionId)+"&view="+role:"auction.html?view="+role;
+ location.href=active.auctionId?"auction.html?id="+encodeURIComponent(active.auctionId)+"&view="+role:"auction.html?view="+role+"&select=1"+(a.submission?.title?"&address="+encodeURIComponent(a.submission.title):"");
  }catch(e){message("payment-message",e.message,true);}}));
 }
 async function portfolio(){
@@ -111,9 +111,31 @@ async function auctionPage(){
  let id=params.get("id")||"",view=params.get("view")==="seller"?"seller":"buyer",actor="",last=null,clockOffset=0,refreshing=false;
  $("test-controls").hidden=!S.demo;
  const select=$("auction-select");
- async function loadList(){const all=await S.list();select.innerHTML=all.map(a=>'<option value="'+esc(a.id)+'">'+esc(a.title)+'</option>').join("");if(!all.length){message("auction-message","No auctions are active yet. Submit a property or portfolio to begin.");select.innerHTML='<option value="">No auctions yet</option>';return false;}
- if(id&&!all.some(a=>a.id===id)){message("auction-message","That auction was not found. Choose an available listing.",true);}
- if(!all.some(a=>a.id===id))id=all[0].id;select.value=id;return true;}
+ let requestedTitle=params.get("address")||"",requireSelection=params.get("select")==="1"||params.has("id")||!!requestedTitle;
+ async function loadList(){
+ const all=await S.list();
+ if(!id&&!params.has("id")&&!params.has("address")&&params.get("select")!=="1"&&view==="buyer"){
+  const account=await S.me("buyer"),submission=account?.submission;
+  if(submission){
+   requestedTitle=submission.title||requestedTitle;
+   const matches=submission.auctionId?all.filter(a=>a.id===submission.auctionId):all.filter(a=>a.title===requestedTitle);
+   if(matches.length===1)id=matches[0].id;
+   else requireSelection=!!requestedTitle||!!submission.auctionId;
+  }
+ }
+ select.innerHTML=all.map(a=>'<option value="'+esc(a.id)+'">'+esc(a.title)+'</option>').join("");
+ if(!all.length){id="";last=null;$("auction-content").hidden=true;message("auction-message","No auctions are active yet. Submit a property or portfolio to begin.");select.innerHTML='<option value="">No auctions yet</option>';return false;}
+ if(!all.some(a=>a.id===id)){
+  if(requireSelection){
+   const missing=!!id;id="";last=null;$("auction-content").hidden=true;
+   select.insertAdjacentHTML("afterbegin",'<option value="" disabled>'+esc(requestedTitle?requestedTitle+" · No active auction":"Choose a property or portfolio")+'</option>');select.value="";
+   message("auction-message",requestedTitle?"No active auction is available for "+requestedTitle+". Choose another property or portfolio to view an auction.":missing?"That auction is unavailable. Choose another property or portfolio.":"Choose the property or portfolio whose auction you want to view.",missing);
+   return false;
+  }
+  id=all[0].id;
+ }
+ select.value=id;return true;
+ }
  function setView(){S.setRole(view);$("view-buyer").setAttribute("aria-pressed",String(view==="buyer"));$("view-seller").setAttribute("aria-pressed",String(view==="seller"));$("buyer-area").hidden=view!=="buyer";$("seller-area").hidden=view!=="seller";$("activity-title").textContent=view==="seller"?"Seller proceeds":"Your participation";}
  const timeText=ms=>{const sec=Math.max(0,Math.ceil(ms/1000)),d=Math.floor(sec/86400),h=Math.floor(sec/3600)%24,m=Math.floor(sec/60)%60,s=sec%60;return (d?d+"d ":"")+[h,m,s].map(n=>String(n).padStart(2,"0")).join(":");};
  function tick(){if(!last)return;const ms=last.auction.endsAt-(Date.now()+clockOffset);$("auction-clock").textContent=ms<=0?"00:00:00":timeText(ms);if(ms<=0){$("bid-form").hidden=true;if(last.auction.status==="active")refresh();}}
@@ -128,7 +150,12 @@ async function auctionPage(){
  }
  async function refresh(){
  if(refreshing||!id)return;refreshing=true;
- try{last=await S.auction(id,view,actor);const {auction:a,account,isSeller}=last;clockOffset=(last.serverNow||Date.now())-Date.now();const top=C.highest(a),summary=C.sellerSummary(a);
+ const requestedId=id,requestedView=view,requestedActor=actor;
+ const selectionChanged=()=>requestedId!==id||requestedView!==view||requestedActor!==actor;
+ try{
+ const loadedAuction=await S.auction(requestedId,requestedView,requestedActor);if(selectionChanged())return;
+ last=loadedAuction;const {auction:a,account,isSeller}=last;
+ const selectedOption=[...select.options].find(option=>option.value===a.id);if(selectedOption)selectedOption.textContent=a.title;select.value=a.id;clockOffset=(last.serverNow||Date.now())-Date.now();const top=C.highest(a),summary=C.sellerSummary(a);
  $("auction-content").hidden=false;$("auction-title").textContent=a.title;$("auction-kind").textContent=a.kind==="portfolio"?"Portfolio · "+(a.portfolioCount??a.portfolio?.length??0)+" properties":"Property";$("auction-status").textContent=a.status==="active"?"Active":"Closed";$("auction-status").classList.toggle("is-closed",a.status==="closed");
  $("auction-highest").textContent=top?cash(top.amount):"No bids yet";$("auction-count").textContent=String(a.bidCount??a.bids.length);$("auction-duration").textContent=a.days+"-day "+(a.days===1?"test timing":"standard timing");$("auction-deadline").textContent="Closes "+new Date(a.endsAt).toLocaleString();$("reserve-status").textContent=top?(summary.reserveMet?"Required bid reached":"Below required bid"):"Required bid: "+cash(a.reserve);
  const output=resultHTML(a,account,isSeller),result=$("auction-result");result.hidden=!output;if(result.innerHTML!==output)result.innerHTML=output;
@@ -143,17 +170,17 @@ async function auctionPage(){
  const bids=view==="seller"&&isSeller?a.bids:a.bids.filter(b=>b.buyerId===account?.id);
  $("bid-history-title").textContent=view==="seller"&&isSeller?"All associated bids":"Your bid history";$("bid-history").innerHTML=[...bids].sort((x,y)=>y.amount-x.amount).map(b=>"<tr><td>"+esc(b.label)+"</td><td>"+cash(b.amount)+"</td><td>"+esc(new Date(b.at).toLocaleTimeString())+"</td></tr>").join("")||'<tr><td colspan="3">'+(view==="seller"&&!isSeller?"Seller access required.":"No bids to display.")+"</td></tr>";
  tick();
- }catch(e){last=null;$("auction-content").hidden=true;message("auction-message",e.message,true);}finally{refreshing=false;}
+ }catch(e){if(selectionChanged())return;last=null;$("auction-content").hidden=true;message("auction-message",e.message,true);}finally{refreshing=false;if(selectionChanged())refresh();}
  }
  for(const role of ["buyer","seller"])$("view-"+role).addEventListener("click",()=>{view=role;setView();refresh();});
- select.addEventListener("change",()=>{id=select.value;$("bid-amount").value="";history.replaceState(null,"","auction.html?id="+encodeURIComponent(id)+"&view="+view);refresh();});
+ select.addEventListener("change",()=>{id=select.value;last=null;$("auction-content").hidden=true;$("auction-message").hidden=true;$("bid-amount").value="";history.replaceState(null,"","auction.html?id="+encodeURIComponent(id)+"&view="+view);refresh();});
  $("test-actor").addEventListener("change",()=>{actor=field("test-actor");if(actor==="test-seller")view="seller";else if(actor)view="buyer";setView();refresh();});
  $("bid-form").addEventListener("submit",async e=>{e.preventDefault();if(!$("bid-form").reportValidity())return;const button=e.submitter||$("bid-form").querySelector("button");await busy(button,async()=>{try{await S.bid(id,field("bid-amount"),actor);$("bid-consent").checked=false;message("auction-message","Bid placed successfully.");await refresh();}catch(err){message("auction-message",err.message,true);await refresh();}});});
  for(const [button,method,confirmation] of [["finish-auction","finish",false],["restart-auction","restart",true],["complete-sale","completeSale",false]])$(button).addEventListener("click",()=>busy($(button),async()=>{if(confirmation&&!confirm("Restart this test auction and clear its bids?"))return;try{await S[method](id);await refresh();}catch(e){message("auction-message",e.message,true);}}));
  $("reset-demo").addEventListener("click",()=>{if(confirm("Clear all MREO test accounts, uploaded portfolio data, listings, and bids in this browser?")){S.clear();location.href="auction.html";}});
- setView();if(!await loadList())return;
+ setView();const hasSelection=await loadList();
  if(S.demo&&!S.session(view)){actor=view==="seller"?"test-seller":"";$("test-actor").value=actor;}
- await refresh();setInterval(tick,1000);setInterval(()=>{if(!document.hidden)refresh();},5000);window.addEventListener("storage",e=>{if(e.key===S.key){loadList().then(refresh).catch(err=>message("auction-message",err.message,true));}});document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh();});
+ if(hasSelection)await refresh();setInterval(tick,1000);setInterval(()=>{if(!document.hidden)refresh();},5000);window.addEventListener("storage",e=>{if(e.key===S.key){loadList().then(refresh).catch(err=>message("auction-message",err.message,true));}});document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh();});
 }
 function mediaFallbacks(){document.querySelectorAll("[data-video-image]").forEach(img=>{img.addEventListener("error",()=>{const f=document.createElement("span");f.className="video-fallback";f.textContent="Open the property video →";img.replaceWith(f);});});}
 async function initialize(){

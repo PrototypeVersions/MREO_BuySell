@@ -22,7 +22,7 @@ async function api(path,options={},role=currentRole()){
 }
 async function init(){
  if(!demo){const status=await api("/config");document.querySelectorAll("[data-mode-label]").forEach(el=>{el.textContent=status.testPayments?"Connected test mode · Stripe test payments · No real money":"Connected auctions · Payments verified through Stripe";});return;}
- const s=read();if(s.exampleCatalogVersion>=2)return;
+ const s=read();if(s.exampleCatalogVersion>=3)return;
  let rows=[];
  if(!s.auctions["demo-portfolio"]){
   const response=await fetch("data/reo-sample.json");if(!response.ok)throw Error("The example portfolio could not be loaded.");rows=await response.json();
@@ -32,10 +32,27 @@ async function init(){
  }
  const total=C.portfolioTotals(rows),now=Date.now()-31000;
  const examples=[
- {id:"demo-property",title:"4218 Maple Ridge Drive, Dallas, TX 75229",minimum:350000},
+ {"id":"demo-property","title":"4218 Maple Ridge Drive, Dallas, TX 75229","minimum":350000},
  {id:"demo-portfolio",title:"Illustrative REO portfolio · 150 properties",minimum:Math.round(total.price)-C.FEE,kind:"portfolio",portfolio:rows},
- {id:"demo-fort-worth",title:"7812 Oak Hollow Lane, Fort Worth, TX 76137",minimum:318000},
- {id:"demo-plano",title:"2605 Preston Meadow Court, Plano, TX 75093",minimum:547000}
+ {"id":"demo-fort-worth","title":"7812 Oak Hollow Lane, Fort Worth, TX 76137","minimum":318000},
+ {"id":"demo-plano","title":"2605 Preston Meadow Court, Plano, TX 75093","minimum":547000},
+ {"id":"demo-irving","title":"1147 Riverside Terrace, Irving, TX 75062","minimum":428000},
+ {"id":"demo-garland","title":"3319 Meadowcrest Avenue, Garland, TX 75043","minimum":273000},
+ {"id":"demo-frisco","title":"9014 Silver Creek Way, Frisco, TX 75035","minimum":688000},
+ {"id":"demo-richardson","title":"1420 Northgate Row, Richardson, TX 75080","minimum":397000},
+ {"id":"demo-arlington","title":"6104 Parkstone Drive, Arlington, TX 76017","minimum":336000},
+ {"id":"demo-mckinney","title":"7214 Willow Bend Court, McKinney, TX 75071","minimum":614000},
+ {"id":"demo-mesquite","title":"1827 Creekside Circle, Mesquite, TX 75149","minimum":247000},
+ {"id":"demo-carrollton","title":"3042 Stonebrook Lane, Carrollton, TX 75007","minimum":461000},
+ {"id":"demo-southlake","title":"1850 Cedar Ridge Boulevard, Southlake, TX 76092","minimum":1124000},
+ {"id":"demo-denton","title":"940 Hickory Grove Road, Denton, TX 76209","minimum":354000},
+ {"id":"demo-addison","title":"5016 Meridian Place, Addison, TX 75001","minimum":448000},
+ {"id":"demo-lewisville","title":"2317 Lakeview Terrace, Lewisville, TX 75067","minimum":414000},
+ {"id":"demo-grapevine","title":"805 Vineyard Crossing, Grapevine, TX 76051","minimum":578000},
+ {"id":"demo-dallas-condo","title":"3921 Travis Street Unit 204, Dallas, TX 75204","minimum":398000},
+ {"id":"demo-allen","title":"1709 Brookfield Drive, Allen, TX 75002","minimum":514000},
+ {"id":"demo-colleyville","title":"6408 Heritage Oaks Drive, Colleyville, TX 76034","minimum":874000},
+ {"id":"demo-grand-prairie","title":"2906 Prairie Creek Road, Grand Prairie, TX 75052","minimum":288000}
  ];
  for(const example of examples){
   if(s.auctions[example.id])continue;
@@ -44,7 +61,7 @@ async function init(){
  }
  // Retain any saved bids on the retired example without offering it for auction.
  if(s.auctions["video-property"])s.auctions["video-property"].hidden=true;
- s.exampleCatalogVersion=2;write(s);
+ s.exampleCatalogVersion=3;write(s);
 }
 async function register(role,details,submission){
  if(!["buyer","seller"].includes(role))throw Error("Choose a buyer or seller account.");

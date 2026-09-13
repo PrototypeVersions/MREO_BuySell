@@ -22,7 +22,7 @@ test("all pages load without script errors or horizontal overflow",async({page})
  expect(new URL(page.url()).searchParams.has("auction")).toBe(false);
  expect(errors).toEqual([]);
 });
-test("buyer without a linked auction reaches auctions after payment and with existing credit",async({page})=>{
+test("buyer interest without an auction requires choosing a listing",async({page})=>{
  await page.goto("/buyer.html?address=Address%20awaiting%20confirmation%2C%20Turkey&price=7500000");
  await page.locator("#buyer-name").fill("Unlinked Buyer");
  await page.locator("#buyer-email").fill("unlinked-buyer@example.com");
@@ -31,40 +31,54 @@ test("buyer without a linked auction reaches auctions after payment and with exi
  await expect(page).toHaveURL(/payment\.html\?role=buyer$/);
  await page.locator("#payment-consent").check();
  await page.locator("#payment-submit").click();
- await expect(page).toHaveURL(/auction\.html\?view=buyer$/);
- await expect(page.locator("#bid-form")).toBeVisible();
+ await expect(page).toHaveURL(/auction\.html\?view=buyer&select=1&address=/);
+ await expect(page.locator("#auction-select")).toHaveValue("");
+ await expect(page.locator("#auction-select option:checked")).toHaveText("Address awaiting confirmation, Turkey · No active auction");
+ await expect(page.locator("#auction-content")).toBeHidden();
  await expect(page.locator("#auction-select option[value='video-property']")).toHaveCount(0);
+ await page.locator("#auction-select").selectOption("demo-grapevine");
+ await expect(page.locator("#auction-title")).toHaveText("805 Vineyard Crossing, Grapevine, TX 76051");
+ await expect(page.locator("#bid-form")).toBeVisible();
  await page.goto("/payment.html?role=buyer");
  await expect(page.locator("#payment-credit")).toHaveText("$1.00 test");
  await expect(page.locator("#payment-submit")).toHaveText("Continue to auction →");
  await page.locator("#payment-submit").click();
- await expect(page).toHaveURL(/auction\.html\?view=buyer$/);
- await expect(page.locator("#bid-form")).toBeVisible();
+ await expect(page).toHaveURL(/auction\.html\?view=buyer&select=1&address=/);
+ await expect(page.locator("#auction-select")).toHaveValue("");
+ await expect(page.locator("#auction-select option:checked")).toHaveText("Address awaiting confirmation, Turkey · No active auction");
+ await expect(page.locator("#auction-content")).toBeHidden();
 });
-test("property listing selection survives payment and subsequent buyer interests",async({page})=>{
- const listings=[
-  ["2605 Preston Meadow Court","2605 Preston Meadow Court, Plano, TX 75093","demo-plano"],
-  ["4218 Maple Ridge Drive","4218 Maple Ridge Drive, Dallas, TX 75229","demo-property"],
-  ["7812 Oak Hollow Lane","7812 Oak Hollow Lane, Fort Worth, TX 76137","demo-fort-worth"]
- ];
- for(const [index,[street,address,id]] of listings.entries()){
-  await page.goto("/properties.html");
-  const listing=page.locator(".property-marketplace > .property-row").filter({has:page.getByRole("heading",{name:street,exact:true})});
-  await listing.getByRole("link",{name:"View / Prepare Interest",exact:true}).click();
-  expect(new URL(page.url()).searchParams.get("auction")).toBe(id);
-  await expect(page.locator("#buyer-offer-address")).toHaveValue(address);
-  await page.locator("#buyer-name").fill("Property Buyer");
-  await page.locator("#buyer-email").fill("property-buyer@example.com");
-  await page.locator("#buyer-confirmation").check();
-  await page.getByRole("button",{name:"Submit Buyer Interest",exact:true}).click();
-  await expect(page).toHaveURL(/payment\.html\?role=buyer$/);
-  if(index===0)await page.locator("#payment-consent").check();
-  else await expect(page.locator("#payment-submit")).toHaveText("Continue to auction →");
-  await page.locator("#payment-submit").click();
-  await expect(page).toHaveURL(new RegExp("auction\\.html\\?id="+id+"&view=buyer$"));
-  await expect(page.locator("#auction-select")).toHaveValue(id);
-  await expect(page.locator("#auction-title")).toHaveText(address);
-  await expect(page.locator("#bid-form")).toBeVisible();
+test("every sample property opens its own auction through buyer participation",async({page})=>{
+ test.setTimeout(120000);
+ await page.goto("/properties.html");
+ const listings=await page.locator('.property-marketplace a[href^="buyer.html?"]').evaluateAll(links=>links.map(link=>{
+  const params=new URL(link.href).searchParams;
+  return {id:params.get("auction"),address:params.get("address")};
+ }));
+ expect(listings).toHaveLength(20);
+ expect(listings.every(listing=>listing.id&&listing.address)).toBe(true);
+ expect(new Set(listings.map(listing=>listing.id)).size).toBe(20);
+ listings.sort((a,b)=>Number(b.id==="demo-grapevine")-Number(a.id==="demo-grapevine"));
+ for(const [index,{address,id}] of listings.entries()){
+  await test.step(address,async()=>{
+   await page.goto("/properties.html");
+   await page.locator('.property-marketplace a[href^="buyer.html?auction='+id+'&"]').click();
+   expect(new URL(page.url()).searchParams.get("auction")).toBe(id);
+   await expect(page.locator("#buyer-offer-address")).toHaveValue(address);
+   await page.locator("#buyer-name").fill("Property Buyer");
+   await page.locator("#buyer-email").fill("property-buyer@example.com");
+   await page.locator("#buyer-confirmation").check();
+   await page.getByRole("button",{name:"Submit Buyer Interest",exact:true}).click();
+   await expect(page).toHaveURL(/payment\.html\?role=buyer$/);
+   if(index===0)await page.locator("#payment-consent").check();
+   else await expect(page.locator("#payment-submit")).toHaveText("Continue to auction →");
+   await page.locator("#payment-submit").click();
+   await expect(page).toHaveURL(new RegExp("auction\\.html\\?id="+id+"&view=buyer$"));
+   await expect(page.locator("#auction-select")).toHaveValue(id);
+   await expect(page.locator("#auction-select option:checked")).toHaveText(address);
+   await expect(page.locator("#auction-title")).toHaveText(address);
+   await expect(page.locator("#bid-form")).toBeVisible();
+  });
  }
 });
 test("older address-only Plano interest opens the matching auction with existing credit",async({page})=>{
@@ -173,51 +187,99 @@ test("malformed portfolio input is rejected with a clear message",async({page})=
  expect(await page.locator("#portfolio-file").evaluate(el=>el.validity.valid)).toBe(false);
 });
 
-test("auction examples migrate existing saved data without losing bids or accounts",async({page})=>{
+test("all sample auctions migrate without losing saved Grapevine interest, credit, or bids",async({page})=>{
  await page.goto("/auction.html");
- await expect(page.locator("#auction-select option")).toHaveCount(4);
+ await expect(page.locator("#auction-select option")).toHaveCount(21);
  const before=await page.evaluate(()=>{
   const S=window.MreoService,C=window.MreoCore,state=JSON.parse(localStorage.getItem(S.key));
-  delete state.exampleCatalogVersion;
-  delete state.auctions["demo-fort-worth"];
-  delete state.auctions["demo-plano"];
+  state.exampleCatalogVersion=2;
+  const existingIds=["demo-property","demo-portfolio","demo-fort-worth","demo-plano"];
+  for(const id of Object.keys(state.auctions))if(!existingIds.includes(id))delete state.auctions[id];
   const legacy=C.createAuction({id:"video-property",title:"Featured video property",sellerId:"test-seller",minimum:7499000,now:Date.now()-31000,demo:true});
   legacy.example=true;C.seedDemo(legacy);state.auctions[legacy.id]=legacy;
   C.placeBid(state.auctions["demo-property"],{buyerId:"test-buyer-a",label:"Test Buyer A",amount:490000,paid:true});
   state.accounts["test-buyer-a"].creditCents=200;
-  state.accounts["saved-buyer"]={id:"saved-buyer",name:"Saved buyer",role:"buyer",creditCents:100,submission:{auctionId:"video-property"}};
+  state.accounts["saved-buyer"]={id:"saved-buyer",name:"Saved Grapevine buyer",role:"buyer",creditCents:100,submission:{auctionId:"",title:"805 Vineyard Crossing, Grapevine, TX 76051"}};
+  state.accounts["retired-buyer"]={id:"retired-buyer",name:"Retired listing buyer",role:"buyer",creditCents:100,submission:{auctionId:"video-property"}};
   const custom=C.createAuction({id:"saved-property",title:"Seller's saved property",sellerId:"test-seller",minimum:100000,demo:true});
   custom.example=false;state.auctions[custom.id]=custom;
   localStorage.setItem(S.key,JSON.stringify(state));
-  return {property:state.auctions["demo-property"],portfolio:state.auctions["demo-portfolio"],legacy,accounts:state.accounts,custom};
+  return {existing:Object.fromEntries(existingIds.map(id=>[id,state.auctions[id]])),legacy,accounts:state.accounts,custom};
  });
  await page.reload();
- await expect(page.locator("#auction-select option")).toHaveCount(5);
+ await expect(page.locator("#auction-select option")).toHaveCount(22);
  await expect(page.locator('#auction-select option[value="video-property"]')).toHaveCount(0);
  await expect(page.locator('#auction-select option[value="saved-property"]')).toHaveText("Seller's saved property");
  const after=await page.evaluate(()=>JSON.parse(localStorage.getItem(window.MreoService.key)));
- expect(after.auctions["demo-property"].bids).toEqual(before.property.bids);
- expect(after.auctions["demo-property"].endsAt).toEqual(before.property.endsAt);
- expect(after.auctions["demo-portfolio"].bids).toEqual(before.portfolio.bids);
- expect(after.auctions["demo-portfolio"].endsAt).toEqual(before.portfolio.endsAt);
+ expect(after.exampleCatalogVersion).toBe(3);
+ for(const [id,auction] of Object.entries(before.existing)){
+  expect(after.auctions[id].bids).toEqual(auction.bids);
+  expect(after.auctions[id].endsAt).toEqual(auction.endsAt);
+ }
  expect(after.auctions["video-property"].bids).toEqual(before.legacy.bids);
  expect(after.auctions["video-property"].hidden).toBe(true);
  expect(after.accounts).toEqual(before.accounts);
  expect(after.auctions["saved-property"].endsAt).toEqual(before.custom.endsAt);
- for(const [id,title] of [["demo-fort-worth","7812 Oak Hollow Lane, Fort Worth, TX 76137"],["demo-plano","2605 Preston Meadow Court, Plano, TX 75093"]]){
+ for(const [id,title] of [["demo-fort-worth","7812 Oak Hollow Lane, Fort Worth, TX 76137"],["demo-plano","2605 Preston Meadow Court, Plano, TX 75093"],["demo-grapevine","805 Vineyard Crossing, Grapevine, TX 76051"]]){
   await page.locator("#auction-select").selectOption(id);
   await expect(page.locator("#auction-title")).toHaveText(title);
   await expect(page.locator("#auction-count")).toHaveText("3");
  }
  const retiredDraft=await page.evaluate(async()=>{
   const S=window.MreoService;
-  sessionStorage.setItem(S.key+":demo:buyer",JSON.stringify({id:"saved-buyer",role:"buyer"}));
+  sessionStorage.setItem(S.key+":demo:buyer",JSON.stringify({id:"retired-buyer",role:"buyer"}));
   return S.activate("buyer");
  });
  expect(retiredDraft.auctionId).toBeNull();
+ await page.evaluate(()=>{
+  const S=window.MreoService;
+  sessionStorage.setItem(S.key+":demo:buyer",JSON.stringify({id:"saved-buyer",role:"buyer"}));
+ });
+ await page.goto("/auction.html?view=buyer");
+ await expect(page.locator("#auction-select option:checked")).toHaveText("805 Vineyard Crossing, Grapevine, TX 76051");
+ await expect(page.locator("#auction-title")).toHaveText("805 Vineyard Crossing, Grapevine, TX 76051");
+ await page.goto("/payment.html?role=buyer");
+ await expect(page.locator("#payment-credit")).toHaveText("$1.00 test");
+ await expect(page.locator("#payment-submit")).toHaveText("Continue to auction →");
+ await page.locator("#payment-submit").click();
+ await expect(page).toHaveURL(/auction\.html\?id=demo-grapevine&view=buyer$/);
+ await expect(page.locator("#auction-title")).toHaveText("805 Vineyard Crossing, Grapevine, TX 76051");
+ await expect(page.locator("#bid-form")).toBeVisible();
  await page.reload();
- await expect(page.locator("#auction-select option")).toHaveCount(5);
+ await expect(page.locator("#auction-select option")).toHaveCount(22);
  const again=await page.evaluate(()=>JSON.parse(localStorage.getItem(window.MreoService.key)));
- expect(again.auctions["demo-fort-worth"].endsAt).toBe(after.auctions["demo-fort-worth"].endsAt);
- expect(again.auctions["demo-plano"].endsAt).toBe(after.auctions["demo-plano"].endsAt);
+ for(const id of ["demo-fort-worth","demo-plano","demo-grapevine"])expect(again.auctions[id].endsAt).toBe(after.auctions[id].endsAt);
+});
+
+test("an unavailable auction never substitutes a different property",async({page})=>{
+ await page.goto("/auction.html?id=missing-property&view=buyer");
+ await expect(page.locator("#auction-select")).toHaveValue("");
+ await expect(page.locator("#auction-content")).toBeHidden();
+ await expect(page.locator("#auction-message")).toContainText("That auction is unavailable");
+ await page.locator("#auction-select").selectOption("demo-grapevine");
+ await expect(page).toHaveURL(/auction\.html\?id=demo-grapevine&view=buyer$/);
+ await expect(page.locator("#auction-title")).toHaveText("805 Vineyard Crossing, Grapevine, TX 76051");
+ await expect(page.locator("#auction-message")).toBeHidden();
+});
+
+test("changing selection during a slow auction load keeps the dropdown and heading together",async({page})=>{
+ await page.goto("/auction.html");
+ await expect(page.locator("#auction-title")).toHaveText("4218 Maple Ridge Drive, Dallas, TX 75229");
+ await page.evaluate(()=>{
+  const service=window.MreoService,original=service.auction;
+  const pause=new Promise(resolve=>window.releaseAuctionRequest=resolve);
+  let delayed=false;
+  service.auction=async(...args)=>{
+   if(args[0]==="demo-plano"&&!delayed){delayed=true;window.auctionRequestPaused=true;await pause;}
+   return original(...args);
+  };
+ });
+ await page.locator("#auction-select").selectOption("demo-plano");
+ await expect.poll(()=>page.evaluate(()=>window.auctionRequestPaused)).toBe(true);
+ await expect(page.locator("#auction-content")).toBeHidden();
+ await page.locator("#auction-select").selectOption("demo-grapevine");
+ await page.evaluate(()=>window.releaseAuctionRequest());
+ await expect(page.locator("#auction-select")).toHaveValue("demo-grapevine");
+ await expect(page.locator("#auction-select option:checked")).toHaveText("805 Vineyard Crossing, Grapevine, TX 76051");
+ await expect(page.locator("#auction-title")).toHaveText("805 Vineyard Crossing, Grapevine, TX 76051");
 });
