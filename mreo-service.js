@@ -12,6 +12,11 @@ function read(){const s=localStorage.getItem(key);if(!s)return {accounts:{},auct
 function write(s){try{const value=JSON.stringify(s);if(localStorage.getItem(key)!==value)localStorage.setItem(key,value);}catch{throw Error("Browser storage is full or unavailable. Download your portfolio, then clear old test data or use another browser.");}}
 function session(role=currentRole()){try{return JSON.parse(sessionStorage.getItem(sessionKey(role))||"null");}catch{return null;}}
 function keep(role,account){sessionStorage.setItem(sessionKey(role),JSON.stringify(account));setRole(role);}
+function demoAccount(state,auction,role,actor){
+ // Test Seller previews the owner of the selected listing, including user-created listings.
+ const id=actor==="test-seller"?auction.sellerId:actor||session(role)?.id;
+ return state.accounts[id]||null;
+}
 function clear(){localStorage.removeItem(key);for(const role of ["buyer","seller"])sessionStorage.removeItem(sessionKey(role));}
 const uid=prefix=>prefix+"-"+crypto.randomUUID();
 async function api(path,options={},role=currentRole()){
@@ -112,12 +117,12 @@ async function auction(id,view="buyer",actor){
  if(!demo)return api("/auctions/"+encodeURIComponent(id)+"?view="+encodeURIComponent(view),{},view);
  const s=read(),a=s.auctions[id];if(!visibleAuction(a))throw Error("This auction was not found. Choose another listing.");
  C.seedDemo(a);write(s);
- const account=actor?s.accounts[actor]:s.accounts[session(view)?.id];
+ const account=demoAccount(s,a,view,actor);
  return {auction:a,account:account||null,isSeller:account?.id===a.sellerId,serverNow:Date.now()};
 }
 async function bid(id,amount,actor){
  if(!demo)return api("/auctions/"+encodeURIComponent(id)+"/bids",{method:"POST",body:JSON.stringify({amount})},"buyer");
- const s=read(),a=s.auctions[id],account=s.accounts[actor||session("buyer")?.id];if(!visibleAuction(a))throw Error("Auction not found.");C.seedDemo(a);
+ const s=read(),a=s.auctions[id];if(!visibleAuction(a))throw Error("Auction not found.");const account=demoAccount(s,a,"buyer",actor);C.seedDemo(a);
  C.placeBid(a,{amount,buyerId:account?.id,label:account?.name,paid:account?.creditCents>=100});write(s);return {ok:true};
 }
 async function finish(id){if(!demo)throw Error("Test controls are unavailable.");const s=read(),a=s.auctions[id];if(!a)throw Error("Auction not found.");C.seedDemo(a,a.endsAt-1);const now=Date.now();for(const b of a.bids)b.at=Math.min(b.at,now);a.endsAt=now;C.closeAuction(a);write(s);}
