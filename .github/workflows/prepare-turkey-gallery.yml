@@ -1,35 +1,26 @@
-name: Capture Turkey property images
+name: Collect public Turkey video previews
 on:
   push:
     branches: [media/turkey-gallery-20260913]
     paths:
-      - 'tools/capture_turkey_gallery.mjs'
-      - 'tools/turkey_contact_sheet.py'
+      - 'tools/collect_turkey_previews.py'
       - '.github/workflows/prepare-turkey-gallery.yml'
 permissions:
   contents: write
 jobs:
-  capture:
+  collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-      - name: Install browser tools
-        run: |
-          npm install --ignore-scripts --no-audit --no-fund
-          npx playwright install --with-deps chromium
-          python -m pip install --disable-pip-version-check Pillow
-      - name: Capture frames through normal video playback
-        run: |
-          node tools/capture_turkey_gallery.mjs
-          python tools/turkey_contact_sheet.py
-      - name: Save extracted images on the media branch
+      - name: Install image reader
+        run: python -m pip install --disable-pip-version-check Pillow
+      - name: Collect public video preview images
+        run: python tools/collect_turkey_previews.py
+      - name: Save images for review
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add .media-review/turkey
-          git commit -m 'Save browser-captured video frames for Turkey gallery review'
+          git commit -m 'Save highest-resolution public Turkey video previews'
           git push origin HEAD:media/turkey-gallery-20260913
