@@ -22,6 +22,25 @@ test("all pages load without script errors or horizontal overflow",async({page})
  expect(new URL(page.url()).searchParams.has("auction")).toBe(false);
  expect(errors).toEqual([]);
 });
+test("buyer without a linked auction reaches auctions after payment and with existing credit",async({page})=>{
+ await page.goto("/buyer.html?address=Address%20awaiting%20confirmation%2C%20Turkey&price=7500000");
+ await page.locator("#buyer-name").fill("Unlinked Buyer");
+ await page.locator("#buyer-email").fill("unlinked-buyer@example.com");
+ await page.locator("#buyer-confirmation").check();
+ await page.getByRole("button",{name:"Submit Buyer Interest",exact:true}).click();
+ await expect(page).toHaveURL(/payment\.html\?role=buyer$/);
+ await page.locator("#payment-consent").check();
+ await page.locator("#payment-submit").click();
+ await expect(page).toHaveURL(/auction\.html\?view=buyer$/);
+ await expect(page.locator("#bid-form")).toBeVisible();
+ await expect(page.locator("#auction-select option[value='video-property']")).toHaveCount(0);
+ await page.goto("/payment.html?role=buyer");
+ await expect(page.locator("#payment-credit")).toHaveText("$1.00 test");
+ await expect(page.locator("#payment-submit")).toHaveText("Continue to auction →");
+ await page.locator("#payment-submit").click();
+ await expect(page).toHaveURL(/auction\.html\?view=buyer$/);
+ await expect(page.locator("#bid-form")).toBeVisible();
+});
 test("buyer payment gate, bidding, persistent outcome and both perspectives",async({page})=>{
  await page.goto("/buyer.html?auction=demo-property&address=4218%20Maple%20Ridge%20Drive");
  await page.locator("#buyer-name").fill("Test Participant");
@@ -33,7 +52,7 @@ test("buyer payment gate, bidding, persistent outcome and both perspectives",asy
  await expect(page.locator("#payment-message")).toContainText("confirm");
  await page.locator("#payment-consent").check();
  await page.locator("#payment-submit").click();
- await expect(page).toHaveURL(/auction.html/);
+ await expect(page).toHaveURL(/auction\.html\?id=demo-property&view=buyer$/);
  await expect(page.locator("#bid-form")).toBeVisible();
  await page.locator("#bid-amount").fill("500000");
  await page.locator("#bid-consent").check();

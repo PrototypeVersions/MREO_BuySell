@@ -67,7 +67,7 @@ async function payment(){
  button.addEventListener("click",()=>busy(button,async()=>{try{
  a=await S.me(role);if(a.creditCents<100){const r=await S.checkout(role,$("payment-consent").checked);if(!S.demo&&!r.paid){const url=new URL(r.url);if(url.protocol!=="https:"||url.hostname!=="checkout.stripe.com")throw Error("Unexpected checkout address.");location.assign(url.href);return;}a=await S.me(role);$("payment-credit").textContent="$1.00 test";}
  const active=await S.activate(role);
- location.href=active.auctionId?"auction.html?id="+encodeURIComponent(active.auctionId)+"&view="+role:"properties.html?participation=ready";
+ location.href=active.auctionId?"auction.html?id="+encodeURIComponent(active.auctionId)+"&view="+role:"auction.html?view="+role;
  }catch(e){message("payment-message",e.message,true);}}));
 }
 async function portfolio(){
