@@ -1,35 +1,57 @@
 {
-  "source": "https://www.youtube.com/watch?v=MUdBlpLWFEY",
-  "processing": "Highest-resolution public YouTube video previews. Original downloaded JPEGs, without generative editing.",
-  "accessNote": "Direct video extraction and normal browser playback required YouTube sign-in. These four public previews are the highest-resolution versions available through the public preview URLs checked (640x480). No artificial details were added.",
+  "source": "User-supplied video frames committed to PrototypeVersions/MREO_BuySell",
+  "sourceCommit": "f65b21d94b1d579850dcef8c9ffe198c69bdddcd",
+  "video": "https://www.youtube.com/watch?v=MUdBlpLWFEY",
+  "processing": "Full-resolution WebP encoding at quality 95. Original PNGs retained and linked from the gallery. No cropping, upscaling, or generative edits.",
+  "cover": "assets/turkey/photos/videoframe_18959.webp",
   "images": [
     {
-      "file": "front-exterior.jpg",
-      "caption": "Front exterior and terraces",
-      "source": "https://i.ytimg.com/vi/MUdBlpLWFEY/sd1.jpg",
-      "width": 640,
-      "height": 480
+      "original": "assets/videoframe_18959.png",
+      "webImage": "assets/turkey/photos/videoframe_18959.webp",
+      "caption": "Front exterior",
+      "width": 1280,
+      "height": 720,
+      "bytes": 130960
     },
     {
-      "file": "pool-and-waterfront.jpg",
+      "original": "assets/videoframe_25702.png",
+      "webImage": "assets/turkey/photos/videoframe_25702.webp",
+      "caption": "Terrace, pool, and waterfront views",
+      "width": 1280,
+      "height": 720,
+      "bytes": 155602
+    },
+    {
+      "original": "assets/videoframe_31960.png",
+      "webImage": "assets/turkey/photos/videoframe_31960.webp",
+      "caption": "Living area overlooking the water",
+      "width": 1280,
+      "height": 720,
+      "bytes": 111614
+    },
+    {
+      "original": "assets/videoframe_53771.png",
+      "webImage": "assets/turkey/photos/videoframe_53771.webp",
+      "caption": "Exterior and courtyard",
+      "width": 1280,
+      "height": 720,
+      "bytes": 202716
+    },
+    {
+      "original": "assets/videoframe_69284.png",
+      "webImage": "assets/turkey/photos/videoframe_69284.webp",
+      "caption": "Bedroom with a waterfront view",
+      "width": 1280,
+      "height": 720,
+      "bytes": 74392
+    },
+    {
+      "original": "assets/videoframe_117052.png",
+      "webImage": "assets/turkey/photos/videoframe_117052.webp",
       "caption": "Pool and waterfront terrace",
-      "source": "https://i.ytimg.com/vi/MUdBlpLWFEY/sd3.jpg",
-      "width": 640,
-      "height": 480
-    },
-    {
-      "file": "aerial-property.jpg",
-      "caption": "Aerial view of the property",
-      "source": "https://i.ytimg.com/vi/MUdBlpLWFEY/sd2.jpg",
-      "width": 640,
-      "height": 480
-    },
-    {
-      "file": "overhead-terrace.jpg",
-      "caption": "Overhead view of the terrace",
-      "source": "https://i.ytimg.com/vi/MUdBlpLWFEY/sddefault.jpg",
-      "width": 640,
-      "height": 480
+      "width": 1280,
+      "height": 720,
+      "bytes": 186868
     }
   ]
 }
