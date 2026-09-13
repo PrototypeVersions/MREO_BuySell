@@ -41,6 +41,52 @@ test("buyer without a linked auction reaches auctions after payment and with exi
  await expect(page).toHaveURL(/auction\.html\?view=buyer$/);
  await expect(page.locator("#bid-form")).toBeVisible();
 });
+test("property listing selection survives payment and subsequent buyer interests",async({page})=>{
+ const listings=[
+  ["2605 Preston Meadow Court","2605 Preston Meadow Court, Plano, TX 75093","demo-plano"],
+  ["4218 Maple Ridge Drive","4218 Maple Ridge Drive, Dallas, TX 75229","demo-property"],
+  ["7812 Oak Hollow Lane","7812 Oak Hollow Lane, Fort Worth, TX 76137","demo-fort-worth"]
+ ];
+ for(const [index,[street,address,id]] of listings.entries()){
+  await page.goto("/properties.html");
+  const listing=page.locator(".property-marketplace > .property-row").filter({has:page.getByRole("heading",{name:street,exact:true})});
+  await listing.getByRole("link",{name:"View / Prepare Interest",exact:true}).click();
+  expect(new URL(page.url()).searchParams.get("auction")).toBe(id);
+  await expect(page.locator("#buyer-offer-address")).toHaveValue(address);
+  await page.locator("#buyer-name").fill("Property Buyer");
+  await page.locator("#buyer-email").fill("property-buyer@example.com");
+  await page.locator("#buyer-confirmation").check();
+  await page.getByRole("button",{name:"Submit Buyer Interest",exact:true}).click();
+  await expect(page).toHaveURL(/payment\.html\?role=buyer$/);
+  if(index===0)await page.locator("#payment-consent").check();
+  else await expect(page.locator("#payment-submit")).toHaveText("Continue to auction →");
+  await page.locator("#payment-submit").click();
+  await expect(page).toHaveURL(new RegExp("auction\\.html\\?id="+id+"&view=buyer$"));
+  await expect(page.locator("#auction-select")).toHaveValue(id);
+  await expect(page.locator("#auction-title")).toHaveText(address);
+  await expect(page.locator("#bid-form")).toBeVisible();
+ }
+});
+test("older address-only Plano interest opens the matching auction with existing credit",async({page})=>{
+ const address="2605 Preston Meadow Court, Plano, TX 75093";
+ await page.goto("/buyer.html?address="+encodeURIComponent(address)+"&price=548000");
+ await page.locator("#buyer-name").fill("Existing Plano Buyer");
+ await page.locator("#buyer-email").fill("existing-plano@example.com");
+ await page.locator("#buyer-confirmation").check();
+ await page.getByRole("button",{name:"Submit Buyer Interest",exact:true}).click();
+ await expect(page).toHaveURL(/payment\.html\?role=buyer$/);
+ await page.locator("#payment-consent").check();
+ await page.locator("#payment-submit").click();
+ await expect(page).toHaveURL(/auction\.html\?id=demo-plano&view=buyer$/);
+ await expect(page.locator("#auction-title")).toHaveText(address);
+ await page.goto("/payment.html?role=buyer");
+ await expect(page.locator("#payment-credit")).toHaveText("$1.00 test");
+ await expect(page.locator("#payment-submit")).toHaveText("Continue to auction →");
+ await page.locator("#payment-submit").click();
+ await expect(page).toHaveURL(/auction\.html\?id=demo-plano&view=buyer$/);
+ await expect(page.locator("#auction-select")).toHaveValue("demo-plano");
+ await expect(page.locator("#auction-title")).toHaveText(address);
+});
 test("buyer payment gate, bidding, persistent outcome and both perspectives",async({page})=>{
  await page.goto("/buyer.html?auction=demo-property&address=4218%20Maple%20Ridge%20Drive");
  await page.locator("#buyer-name").fill("Test Participant");

@@ -75,7 +75,13 @@ async function confirm(role,id){
 async function activate(role){
  if(!demo)return api("/activate",{method:"POST",body:"{}"},role);
  const s=read(),a=s.accounts[session(role)?.id];if(!a||a.creditCents<100)throw Error("Complete the $1 participation step.");
- if(role==="buyer"){const id=a.submission?.auctionId;return {auctionId:visibleAuction(s.auctions[id])?id:null};}
+ if(role==="buyer"){
+  const id=a.submission?.auctionId;
+  if(id)return {auctionId:visibleAuction(s.auctions[id])?id:null};
+  // Older buyer links saved only the address. Recover an unambiguous matching auction.
+  const matches=Object.values(s.auctions).filter(auction=>visibleAuction(auction)&&auction.title===a.submission?.title);
+  return {auctionId:matches.length===1?matches[0].id:null};
+ }
  if(a.submission.auctionId)return {auctionId:a.submission.auctionId};
  const draft=a.submission,id=uid("auction");
  const auction=C.createAuction({id,title:draft.title,sellerId:a.id,minimum:draft.minimum,days:draft.days,kind:draft.kind,portfolio:draft.portfolio||[],demo:true});
