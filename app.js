@@ -330,19 +330,6 @@
             address
           );
 
-        /*
-          Open Zillow immediately in a new tab.
-
-          Doing this directly from the button click makes
-          browsers less likely to block the new tab.
-        */
-
-        window.open(
-          zillowUrl,
-          "_blank",
-          "noopener,noreferrer"
-        );
-
         updateSellerSearchResults(
           address,
           zillowUrl,
@@ -409,9 +396,9 @@
 
           showSellerAutofillStatus(
             "MREO could not retrieve additional property records. " +
-            "The address has been added to the form, and Zillow " +
-            "has opened in a new tab. Please complete the remaining " +
-            "property information manually."
+            "The address has been added to the form. Use the Zillow " +
+            "or Google Maps button to review the property, and complete " +
+            "the remaining property information manually."
           );
 
           scrollToSellerPropertyForm();
