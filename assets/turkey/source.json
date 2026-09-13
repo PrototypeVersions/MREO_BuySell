@@ -1,10 +1,18 @@
 {
   "source": "User-supplied video frames committed to PrototypeVersions/MREO_BuySell",
-  "sourceCommit": "f65b21d94b1d579850dcef8c9ffe198c69bdddcd",
+  "sourceCommit": "30e147e33f2ea912bb8a9b29766538d2ae9f182f",
   "video": "https://www.youtube.com/watch?v=MUdBlpLWFEY",
   "processing": "Full-resolution WebP encoding at quality 95. Original PNGs retained and linked from the gallery. No cropping, upscaling, or generative edits.",
-  "cover": "assets/turkey/photos/videoframe_18959.webp",
+  "cover": "assets/turkey/photos/videoframe_14441.webp",
   "images": [
+    {
+      "bytes": 279802,
+      "height": 720,
+      "original": "assets/videoframe_14441.png",
+      "webImage": "assets/turkey/photos/videoframe_14441.webp",
+      "width": 1280,
+      "caption": "Aerial front view"
+    },
     {
       "original": "assets/videoframe_18959.png",
       "webImage": "assets/turkey/photos/videoframe_18959.webp",
