@@ -45,7 +45,7 @@ class Exchange{
  async schedule(){const active=(await this.allAuctions()).filter(a=>a.status==="active");if(active.length)await this.ctx.storage.setAlarm(Math.max(Date.now()+1000,Math.min(...active.map(a=>a.endsAt))));else await this.ctx.storage.deleteAlarm();}
  async settle(){
  for(const a of await this.allAuctions()){if(a.status!=="active"||Date.now()<a.endsAt)continue;C.closeAuction(a);await this.ctx.storage.put("auction:"+a.id,a);
- const ids=new Set([a.sellerId,...a.bids.map(b=>b.buyerId)]);for(const id of ids)await this.ctx.storage.put("notice:"+id+":"+a.id,{auctionId:a.id,title:a.title,closedAt:a.closedAt,outcome:id===a.sellerId?"seller-result":C.outcome(a,id),highest:C.highest(a)?.amount||0,reserveMet:!!a.winnerId});}
+ const ids=new Set([a.sellerId,...a.bids.map(b=>b.buyerId)]);for(const id of ids)await this.ctx.storage.put("notice:"+id+":"+a.id,{auctionId:a.id,title:a.title,closedAt:a.closedAt,outcome:id===a.sellerId?"seller-result":C.outcome(a,id),...(id===a.sellerId?{highest:C.highest(a)?.amount||0}:{}),reserveMet:!!a.winnerId});}
  await this.schedule();
  }
  async alarm(){await this.ctx.blockConcurrencyWhile(()=>this.settle());}
@@ -115,7 +115,12 @@ class Exchange{
  a.submission.auctionId=id;await this.ctx.storage.put("account:"+a.id,a);await this.schedule();return json({auctionId:id},201);
  }
  if(path==="/auctions"&&method==="GET")return json({auctions:(await this.allAuctions()).map(({id,title,kind,reserve,portfolioCount,status,endsAt,example})=>({id,title,kind,reserve,portfolioCount,status,endsAt,example}))});
- if(path==="/notifications"&&method==="GET"){const a=await this.account(request);return json({notifications:[...(await this.ctx.storage.list({prefix:"notice:"+a.id+":"})).values()]});}
+ if(path==="/notifications"&&method==="GET"){
+ const account=await this.account(request),notices=[...(await this.ctx.storage.list({prefix:"notice:"+account.id+":"})).values()];
+ // Also redact highest amounts from notifications saved before blind bidding.
+ const notifications=await Promise.all(notices.map(async notice=>{const auction=await this.ctx.storage.get("auction:"+notice.auctionId);const {highest,...privateResult}=notice;return auction?.sellerId===account.id?notice:privateResult;}));
+ return json({notifications});
+ }
  const match=path.match(/^\/auctions\/([a-zA-Z0-9-]+)(\/bids)?$/);
  if(match){const a=await this.ctx.storage.get("auction:"+match[1]);if(!a)throw new HttpError("Auction not found.",404);
  if(match[2]&&method==="POST"){
@@ -126,8 +131,7 @@ class Exchange{
  if(!match[2]&&method==="GET"){
  const account=await this.account(request,false),isSeller=account?.id===a.sellerId;
  if(url.searchParams.get("view")==="seller"&&!isSeller)throw new HttpError("Use the listing seller’s account to see all bids and proceeds.",403);
- const top=C.highest(a),visible=isSeller?a.bids:a.bids.filter(b=>b.buyerId===account?.id||b.id===top?.id);
- return json({auction:{...a,bids:visible,bidCount:a.bids.length,portfolio:await this.ctx.storage.get("portfolio:"+a.id)||[]},account:account?this.publicAccount(account):null,isSeller,serverNow:Date.now()});
+ const now=Date.now();return json({auction:{...C.auctionForViewer(a,account?.id,url.searchParams.get("view"),now),portfolio:await this.ctx.storage.get("portfolio:"+a.id)||[]},account:account?this.publicAccount(account):null,isSeller,serverNow:now});
  }}
  throw new HttpError("Route not found.",404);
  }

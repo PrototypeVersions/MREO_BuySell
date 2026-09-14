@@ -18,14 +18,40 @@ test("seller minimum includes the fee, and fees are not due at auction close",()
  assert.deepEqual(C.sellerSummary(a),{highest:270000,reserveMet:true,proceeds:269000,additional:19000,feeDue:0});
  a.saleCompleted=true;assert.equal(C.sellerSummary(a).feeDue,1000);
 });
-test("unpaid participants, sellers, invalid amounts and equal bids cannot bid",()=>{
+test("blind bids accept independent positive amounts while keeping participant checks",()=>{
  const a=make();const bid={buyerId:"a",amount:251000,paid:true,now:2000};
  assert.throws(()=>C.placeBid(a,{...bid,paid:false}),/participation/);
  assert.throws(()=>C.placeBid(a,{...bid,buyerId:"seller"}),/Sellers/);
- for(const amount of [-1,NaN,Infinity,251000.5,1e16])assert.throws(()=>C.placeBid(a,{...bid,amount}));
- C.placeBid(a,bid);assert.throws(()=>C.placeBid(a,{...bid,buyerId:"b"}),/next bid/);
- assert.throws(()=>C.placeBid(a,{...bid,buyerId:"b",amount:251050}),/next bid/);
- C.placeBid(a,{...bid,buyerId:"b",amount:251100});assert.equal(C.highest(a).buyerId,"b");
+ for(const amount of [0,"",-1,NaN,Infinity,251000.5,1e16])assert.throws(()=>C.placeBid(a,{...bid,amount}));
+ C.placeBid(a,bid);
+ for(const amount of [1,250000,251000,251001,251050])C.placeBid(a,{...bid,buyerId:"b",amount});
+ assert.equal(a.bids.length,6);assert.equal(C.highest(a).amount,251050);
+ assert.equal(C.outcome(a,"a",3000),"submitted");assert.equal(C.outcome(a,"b",3000),"submitted");
+ assert.equal(C.outcome(a,"observer",3000),"watching");
+});
+test("equal bids are accepted and the earliest received offer wins at close",()=>{
+ const a=make();
+ C.placeBid(a,{buyerId:"first",id:"z-first",amount:260000,paid:true,now:2000});
+ C.placeBid(a,{buyerId:"second",id:"a-second",amount:260000,paid:true,now:2000});
+ C.placeBid(a,{buyerId:"third",amount:260000,paid:true,now:3000});
+ C.closeAuction(a,a.endsAt);assert.equal(a.winnerId,"first");
+ assert.equal(C.outcome(a,"second",a.endsAt),"lost");
+});
+test("buyer snapshots keep other bids private and report results from the full auction",()=>{
+ const a=make();
+ C.placeBid(a,{buyerId:"winner",amount:300000,paid:true,now:2000});
+ C.placeBid(a,{buyerId:"loser",amount:270000,paid:true,now:3000});
+ const buyer=C.auctionForViewer(a,"loser","buyer",4000);
+ assert.deepEqual(buyer.bids.map(b=>b.amount),[270000]);assert.equal(buyer.bidCount,2);
+ assert.equal(buyer.viewerOutcome,"submitted");assert.equal("winnerId" in buyer,false);
+ assert.equal(C.auctionForViewer(a,undefined,"buyer",4000).bids.length,0);
+ assert.equal(C.auctionForViewer(a,"loser","seller",4000).bids.length,1);
+ assert.equal(C.auctionForViewer(a,"seller","buyer",4000).bids.length,0);
+ assert.equal(C.auctionForViewer(a,"seller","seller",4000).bids.length,2);
+ const closed=C.auctionForViewer(a,"loser","buyer",a.endsAt);
+ assert.equal(closed.viewerOutcome,"lost");assert.deepEqual(closed.bids.map(b=>b.amount),[270000]);
+ assert.equal(C.auctionForViewer(a,"winner","buyer",a.endsAt).viewerOutcome,"won");
+ assert.equal(a.bids.length,2);
 });
 test("deadline is enforced and green/red outcomes require reserve",()=>{
  const a=make();C.placeBid(a,{buyerId:"a",amount:251000,paid:true,now:2000});
@@ -44,6 +70,8 @@ test("demo has exactly three different buyers and never seeds connected auctions
  assert.equal(new Set(a.bids.map(b=>b.amount)).size,3);
  C.seedDemo(a,35000);assert.equal(a.bids.length,3);
  const live=make();C.seedDemo(live,35000);assert.equal(live.bids.length,0);
+ const earlyBid=make({demo:true});C.placeBid(earlyBid,{buyerId:"early",amount:900000,paid:true,now:2000});
+ C.seedDemo(earlyBid,35000);assert.equal(earlyBid.bids.length,4);assert.equal(C.highest(earlyBid).buyerId,"early");
 });
 test("CSV handles quoting, commas, newlines and rejects malformed input",()=>{
  assert.deepEqual(C.parseCSV('a,b\r\n"Oak, Drive","Line 1\nLine ""2"""\r\n'),[["a","b"],["Oak, Drive",'Line 1\nLine "2"']]);

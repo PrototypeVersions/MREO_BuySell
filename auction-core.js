@@ -8,8 +8,8 @@ function createAuction({id,title,sellerId,minimum,days=1,kind="property",portfol
  if(!id||!sellerId||!String(title).trim())throw Error("An auction needs a listing and a seller.");
  return {id,title:String(title).trim().slice(0,300),sellerId,kind,portfolio,minimum:net,reserve:net+FEE,fee:FEE,startsAt:now,endsAt:now+Number(days)*DAY,days:Number(days),bids:[],status:"active",demo:!!demo,seeded:0,closedAt:null,winnerId:null,saleCompleted:false};
 }
-function highest(a){return [...a.bids].sort((x,y)=>y.amount-x.amount||x.at-y.at||String(x.id).localeCompare(String(y.id)))[0]||null;}
-function nextBid(a){return highest(a)?highest(a).amount+100:100;}
+// Stable sorting preserves receipt order when equal bids share a timestamp.
+function highest(a){return [...a.bids].sort((x,y)=>y.amount-x.amount||x.at-y.at)[0]||null;}
 function closeAuction(a,now=Date.now()){
  if(a.status==="active"&&now>=a.endsAt){a.status="closed";a.closedAt=a.endsAt;const top=highest(a);a.winnerId=top&&top.amount>=a.reserve?top.buyerId:null;}
  return a;
@@ -21,21 +21,28 @@ function placeBid(a,{buyerId,label,amount,paid,now=Date.now(),id}){
  if(!paid)throw Error("Complete the $1 participation step before bidding.");
  if(!buyerId||buyerId===a.sellerId)throw Error("Sellers cannot bid on their own listing.");
  const price=money(amount);
- if(price<nextBid(a))throw Error("The next bid must be at least $"+nextBid(a).toLocaleString("en-US")+".");
+ if(price<1)throw Error("Enter a bid greater than zero in whole dollars.");
  const bid={id:id||buyerId+"-"+now,buyerId,label:String(label||"Buyer").slice(0,80),amount:price,at:now};
  a.bids.push(bid);return bid;
 }
 function seedDemo(a,now=Date.now()){
  if(!a.demo||a.status!=="active")return a;
  const schedule=[{after:5000,id:"test-buyer-a",label:"Test Buyer A",factor:.9},{after:15000,id:"test-buyer-b",label:"Test Buyer B",factor:.98},{after:30000,id:"test-buyer-c",label:"Test Buyer C",factor:1.04}];
- for(let i=a.seeded;i<schedule.length;i++){const s=schedule[i],at=a.startsAt+s.after;if(now<at||at>=a.endsAt)break;a.seeded=i+1;const amount=Math.ceil(a.reserve*s.factor/100)*100;if(amount>=nextBid(a))placeBid(a,{buyerId:s.id,label:s.label,amount,paid:true,now:at,id:a.id+"-seed-"+i});}
+ for(let i=a.seeded;i<schedule.length;i++){const s=schedule[i],at=a.startsAt+s.after;if(now<at||at>=a.endsAt)break;a.seeded=i+1;const amount=Math.ceil(a.reserve*s.factor/100)*100;placeBid(a,{buyerId:s.id,label:s.label,amount,paid:true,now:at,id:a.id+"-seed-"+i});}
  return closeAuction(a,now);
 }
 function outcome(a,buyerId,now=Date.now()){
- closeAuction(a,now);const top=highest(a),hasBid=a.bids.some(b=>b.buyerId===buyerId);
- if(a.status==="active")return top?.buyerId===buyerId?"leading":hasBid?"outbid":"watching";
+ closeAuction(a,now);const hasBid=a.bids.some(b=>b.buyerId===buyerId);
+ if(a.status==="active")return hasBid?"submitted":"watching";
  if(!hasBid)return "not-participating";
  return a.winnerId===buyerId?"won":a.winnerId?"lost":"reserve-not-met";
+}
+function auctionForViewer(a,accountId,view="buyer",now=Date.now()){
+ const viewerOutcome=outcome(a,accountId,now),bidCount=a.bids.length;
+ if(view==="seller"&&accountId===a.sellerId)return {...a,bidCount,viewerOutcome};
+ // Only the seller receives competing bids. Compute the result before filtering.
+ const {bids,winnerId,...details}=a;
+ return {...details,bids:bids.filter(b=>b.buyerId===accountId),bidCount,viewerOutcome};
 }
 function sellerSummary(a){const top=highest(a);return {highest:top?.amount||0,reserveMet:!!top&&top.amount>=a.reserve,proceeds:top?Math.max(0,top.amount-a.fee):0,additional:top?Math.max(0,top.amount-a.fee-a.minimum):0,feeDue:a.saleCompleted&&a.winnerId?a.fee:0};}
 function parseCSV(text){
@@ -73,5 +80,5 @@ function normalizePortfolio(matrix){
 function portfolioTotals(rows){return rows.reduce((s,r)=>({count:s.count+1,value:s.value+r.value,price:Math.round((s.value+r.value)*7)/100,repairs:s.repairs+r.repairs,balance:s.balance+r.balance}),{count:0,value:0,price:0,repairs:0,balance:0});}
 function portfolioMatrix(rows){return [COLUMNS,...rows.map(r=>[r.id,r.address,r.city,r.state,r.zip,r.type,r.beds,r.baths,r.sqft,r.occupancy,r.condition,r.value,r.balance,r.repairs,r.taxes,r.hoa,r.title,r.allocation,r.notes])];}
 function csv(rows){return rows.map(row=>row.map(v=>{let s=String(v??"");if(typeof v==="string"&&/^[\s]*[=+\-@]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"';}).join(",")).join("\r\n");}
-globalThis.MreoCore={FEE,DAY,money,createAuction,highest,nextBid,closeAuction,placeBid,seedDemo,outcome,sellerSummary,parseCSV,normalizePortfolio,portfolioTotals,portfolioMatrix,csv,COLUMNS};
+globalThis.MreoCore={FEE,DAY,money,createAuction,highest,closeAuction,placeBid,seedDemo,outcome,auctionForViewer,sellerSummary,parseCSV,normalizePortfolio,portfolioTotals,portfolioMatrix,csv,COLUMNS};
 })();

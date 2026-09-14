@@ -111,14 +111,15 @@ async function activate(role){
 }
 async function list(){
  if(!demo)return (await api("/auctions")).auctions.filter(visibleAuction);
- const s=read(),auctions=Object.values(s.auctions).filter(visibleAuction);for(const a of auctions)C.seedDemo(a);write(s);return auctions;
+ const s=read(),auctions=Object.values(s.auctions).filter(visibleAuction);for(const a of auctions)C.seedDemo(a);write(s);
+ return auctions.map(({id,title,kind,reserve,portfolio,portfolioCount,status,endsAt,example})=>({id,title,kind,reserve,portfolioCount:portfolioCount??portfolio?.length??0,status,endsAt,example}));
 }
 async function auction(id,view="buyer",actor){
  if(!demo)return api("/auctions/"+encodeURIComponent(id)+"?view="+encodeURIComponent(view),{},view);
  const s=read(),a=s.auctions[id];if(!visibleAuction(a))throw Error("This auction was not found. Choose another listing.");
  C.seedDemo(a);write(s);
  const account=demoAccount(s,a,view,actor);
- return {auction:a,account:account||null,isSeller:account?.id===a.sellerId,serverNow:Date.now()};
+ const now=Date.now();return {auction:C.auctionForViewer(a,account?.id,view,now),account:account||null,isSeller:account?.id===a.sellerId,serverNow:now};
 }
 async function bid(id,amount,actor){
  if(!demo)return api("/auctions/"+encodeURIComponent(id)+"/bids",{method:"POST",body:JSON.stringify({amount})},"buyer");
